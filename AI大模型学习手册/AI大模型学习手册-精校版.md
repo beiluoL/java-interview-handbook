@@ -1,10 +1,10 @@
-# 🤖 AI/大模型应用开发学习手册 —— 从零开始（深度版）
+# 🤖 AI 大模型学习手册（精校版）
 
 > **面向读者**：有 Java / 前端编程基础，想系统学习大模型应用开发的小白  
 > **学习目标**：理解底层原理、掌握技术选型、能独立搭建 AI 聊天应用、知识库问答系统（RAG）、智能体（Agent）并具备生产化能力  
 > **预计总时长**：约 60 小时（每周 5 小时，约 12 周完成）  
 > **编写日期**：2025 年 7 月  
-> **版本**：v2.0（深度修订版）
+> **版本说明**：本「精校版」由 v1.2 / v2.1 / v2.2 / v2.3 多版迭代合并而来，以最新的 **v2.3** 为权威底稿，去除了重复版本文件，内容最全。日常学习以此为准即可。
 
 ---
 
@@ -19,6 +19,11 @@
 - [第 5 章：Function Calling 与 Agent —— 让 AI 动手干活](#第-5-章function-calling-与-agent--让-ai-动手干活)
 - [第 6 章：流式输出与生产化 —— 从 Demo 到上线](#第-6-章流式输出与生产化--从-demo-到上线)
 - [第 7 章：GitHub 实战项目推荐 —— 向优秀开源项目学习](#第-7-章github-实战项目推荐--向优秀开源项目学习)
+- [第 8 章：大模型发展简史与底层原理全景](#第-8-章大模型发展简史与底层原理全景)
+- [第 9 章：实战项目 —— 完整天气查询 Agent](#第-9-章实战项目--完整天气查询-agent)
+- [第 10 章：实战项目（一）入门练手](#第-10-章实战项目一入门练手)
+- [第 11 章：实战项目（二）核心能力](#第-11-章实战项目二核心能力)
+- [第 12 章：实战项目（三）进阶工程](#第-12-章实战项目三进阶工程)
 - [附录 A：推荐资源清单](#附录-a推荐资源清单)
 - [附录 B：常见问题 FAQ](#附录-b常见问题-faq)
 - [附录 C：Java AI 工具栈速查](#附录-cjava-ai-工具栈速查)
@@ -31,7 +36,7 @@
 
 ### 这是一份"深度版"手册
 
-相比常见的"跑通 Demo 就完事"的入门教程，本手册 v2.0 更强调**理解原理、技术对比、工程落地**：
+相比常见的"跑通 Demo 就完事"的入门教程，本手册 v2.3 更强调**理解原理、技术对比、工程落地**：
 
 - **讲原理**：Transformer 注意力机制、BPE 分词、Embedding 向量数学、采样参数、RAG 检索链路、ReAct 推理循环——不仅告诉你"怎么做"，更告诉你"为什么这么做"。
 - **做对比**：每个关键技术点都给出横向对比表（DeepSeek vs GPT-4o vs Claude、向量库选型、限流算法、记忆类型……），帮你建立"选型直觉"。
@@ -2993,6 +2998,2511 @@ spec:
 
 ---
 
+## 第 8 章：大模型发展简史与底层原理全景
+
+> 本章目标：让你在动手写代码之外，也能"看懂新闻、听懂术语、分清边界"。读完这一章，你会明白——为什么现在的大模型这么强、它到底在干什么、以及一个 Java/前端开发者到底该从哪儿切入。
+>
+> 全程不堆术语，用类比说话。放心看。
+
+---
+
+### 8.1 为什么要懂一点"历史与原理"
+
+你可能会想：我是来学**怎么用大模型写应用**的，为什么要看历史和原理？
+
+原因很简单，三个"能帮你避坑"的理由：
+
+- **看懂技术新闻**：以后看到"GPT-5、MoE、推理模型、RLHF"这些词，你不会一脸懵，也不会被营销号带节奏。
+- **理解 AI 的"脾气"**：为什么它有时候胡说八道？为什么你指令写得越清楚它答得越好？底层原理能解释这些日常现象。
+- **分清"我能做什么"**：最重要的一点。很多小白误以为"学 AI"就要去训练模型，把自己吓退了。本章会明确告诉你：**训练模型是巨头的事，做应用是你的事**。
+
+一句话：**懂原理不是为了造轮子，是为了用轮子时心里有数。**
+
+---
+
+### 8.2 大模型发展简史（一条时间线读懂 70 年）
+
+我们先把时间轴拉到 1956 年。那时候"人工智能"这个词刚被发明，计算机还像冰箱那么大。下面这条主线，串起了从"AI 概念诞生"到"2025 年全民 AI"的关键里程碑。
+
+```mermaid
+timeline
+    title 大模型发展主线：从 AI 诞生到 2025
+    1956 : 达特茅斯会议 : 人工智能(AI)概念正式诞生
+    1957 : 感知机 Perceptron : 最早的"神经网络"雏形
+    1980s : 专家系统 : 把人类专家规则写进程序
+    1986 : 反向传播算法 : 让神经网络真正可被训练
+    1997 : LSTM : 神经网络能"记住"更长的内容
+    2012 : AlexNet : 深度学习引爆，图像识别超越人类
+    2017 : Transformer : 注意力机制诞生，大模型基石
+    2018 : BERT / GPT-1 : "预训练+微调"范式确立
+    2019 : GPT-2 : 生成文本已相当流畅
+    2020 : GPT-3 : 少样本/上下文学习惊艳全场
+    2022.11 : ChatGPT : 引爆全民 AI 浪潮
+    2023 : GPT-4 / LLaMA / 国内爆发 : 多模态与开源齐飞
+    2024 : GPT-4o / Claude 3.5 : 多模态与强推理并进
+    2025 : DeepSeek-V3 / R1 : 推理模型+极致性价比
+```
+
+下面逐个节点，用"一句话大白话 + 为什么是里程碑"来解释。
+
+#### 1956 达特茅斯会议 —— AI 概念诞生
+- **大白话**：一帮科学家开了个会，正式给"让机器像人一样思考"这个梦想起了个名字叫"人工智能"。
+- **为什么是里程碑**：这是一个领域的"出生证明"。从此，AI 作为一门独立学科存在。
+
+#### 1957 感知机（Perceptron）—— 最早的神经网络
+- **大白话**：科学家造了一个极简的"电子神经元"，能根据输入做简单的"是/否"判断。
+- **为什么是里程碑**：它证明了"机器可以从数据中学习"，这是今天所有神经网络的老祖宗。
+
+#### 1980s 专家系统 —— 把规则写进程序
+- **大白话**：把医生、律师等专家的判断规则一条条写进程序，让电脑像专家一样给建议。
+- **为什么是里程碑**：第一次让 AI 在实际工业里赚钱（比如帮企业做故障诊断），但缺点是"知识靠人硬写"，不好扩展。
+
+#### 1986 反向传播算法（Backpropagation）—— 训练的关键
+- **大白话**：找到了一种"从错误里反推、自动调整每个神经元参数"的数学方法。
+- **为什么是里程碑**：没有它，深层神经网络根本训练不动。它是现代深度学习的"发动机原理"。
+
+#### 1997 LSTM —— 能记住长依赖
+- **大白话**：一种特殊的神经网络结构，擅长"记得前面说过的话"，适合处理句子、语音这种有先后顺序的数据。
+- **为什么是里程碑**：解决了"模型读到文章后半段就忘了开头"的问题，是早期 NLP（自然语言处理）的主力。
+
+#### 2012 AlexNet —— 深度学习引爆
+- **大白话**：一个叫 AlexNet 的模型在图像识别比赛里把人类选手都秒了。
+- **为什么是里程碑**：它证明了"用 GPU 堆大力出奇迹"这条路走得通，直接点燃了深度学习革命。
+
+#### 2017 Transformer —— 大模型的基石
+- **大白话**：一篇叫《Attention Is All You Need》的论文，提出一种叫"注意力机制"的新结构，让模型能同时看整句话、抓住重点。
+- **为什么是里程碑**：**今天所有主流大模型（GPT、BERT、文心、通义……）都是 Transformer 的子孙。** 没有它就没有"大模型时代"。
+
+#### 2018 BERT / GPT-1 —— 预训练范式确立
+- **大白话**：谷歌的 BERT 和 OpenAI 的 GPT-1 提出：先"博览群书"学通用语言，再"岗前培训"做具体任务。
+- **为什么是里程碑**：确立了"预训练 + 微调"这套今天仍在用的标准玩法。
+
+#### 2019 GPT-2 —— 生成变得流畅
+- **大白话**：GPT-2 生成的文章已经相当通顺，真假难辨，OpenAI 当时甚至因为怕被滥用而一度不敢开源。
+- **为什么是里程碑**：展示了"大模型自己就能写出连贯长文"的能力。
+
+#### 2020 GPT-3 —— 少样本/上下文学习
+- **大白话**：GPT-3 参数量暴涨到 1750 亿，你不用专门训练它，只要在对话里给几个例子，它就"秒懂"你要什么。
+- **为什么是里程碑**：开启了"不用微调、靠 Prompt 就能指挥模型"的时代——这正是本手册第 3 章讲的内容。
+
+#### 2022.11 ChatGPT —— 引爆全民 AI
+- **大白话**：OpenAI 把 GPT-3.5 包装成会聊天、听得懂人话的产品，两个月破亿用户。
+- **为什么是里程碑**：AI 第一次走出实验室，变成普通人每天用的工具。你我现在学的东西，起点就在这里。
+
+#### 2023 GPT-4 / LLaMA / 国内大模型爆发
+- **大白话**：GPT-4 支持图文多模态；Meta 开源 LLaMA，让小团队也能玩大模型；国内文心、通义、智谱、DeepSeek 等纷纷登场。
+- **为什么是里程碑**：大模型从"一家独大"变成"百花齐放"，开源 + 国产化让普通人做应用的成本骤降。
+
+#### 2024 GPT-4o / Claude 3.5 —— 多模态与强推理
+- **大白话**：模型能同时看懂文字、图片、声音，并且推理能力更强、响应更快更便宜。
+- **为什么是里程碑**：AI 从"会聊天"进化到"会看会听会想"，应用边界大幅拓宽。
+
+#### 2025 DeepSeek-V3 / R1 —— 推理模型 + 极致性价比
+- **大白话**：DeepSeek 用远低于美国巨头的成本训出顶级模型，R1 还能像人一样"先思考再回答"（推理模型）。
+- **为什么是里程碑**：证明"便宜也能很强"，把大模型门槛打到地板价，极大利好应用开发者。
+
+> **小白记忆法**：1956 起名 → 1986 找到训练方法 → 2012 大力出奇迹 → 2017 Transformer 立基 → 2022 ChatGPT 普及 → 2025 便宜又聪明。抓住这条线，新闻就通了。
+
+---
+
+### 8.3 底层原理全景（小白版，最少公式）
+
+这一部分，我们尽量不写数学公式，只用"它在干什么"的视角来看。
+
+#### 8.3.1 大模型本质在做什么：预测下一个词
+
+你以为大模型在"思考""理解"吗？**不是。** 它的本质只有一件事：
+
+> **根据你前面写的内容，预测"下一个最可能的词"是什么。**
+
+用一个类比——**"读心术接龙游戏"**：
+
+想象你和朋友玩文字接龙。朋友说"今天天气真"，你大脑立刻补出"好"。你并没有"理解宇宙"，你只是根据无数次经验，知道"今天天气真"后面大概率接"好"。
+
+大模型就是这样一个**被喂了几乎整个互联网文本的"接龙高手"**。你输入的每一句，它都基于概率算出"下一个词最可能是哪个"，一个词一个词地往外蹦，连起来就成了回答。
+
+**为什么这个认知很重要？**
+- 它解释了**为什么 AI 会"一本正经地胡说"**：它只是在"接着往下编概率最高的词"，并不总是"知道真相"。
+- 它解释了**为什么你问得越清楚、它答得越好**：你给的"前文"越明确，它预测的"下一个词"就越准。
+- 它解释了**为什么会有"幻觉"**：接龙接顺了，它就自信地编下去，哪怕编的是假的。
+
+记住这句话：**大模型是"概率接龙机"，不是"全知全能的神"。** 这能帮你建立对 AI 的正确预期。
+
+#### 8.3.2 训练三阶段：模型是怎么"长成"的
+
+我们平时调用的模型（比如 GPT、文心、通义），背后都经历了三个阶段。用"培养一个员工"来比喻最直观：
+
+```mermaid
+flowchart TD
+    A[原始模型：一堆随机参数] --> B[第一阶段：预训练 Pre-training]
+    B -->|博览群书：海量互联网文本| C[学到语言规律 + 世界知识]
+    C --> D[第二阶段：有监督微调 SFT]
+    D -->|岗前培训：人工写的高质量问答对| E[学会按指令、像人一样回答]
+    E --> F[第三阶段：RLHF]
+    F -->|用户评价驱动：人类给回答打分| G[学会更安全、更有用、更讨喜]
+    G --> H[可用的对话大模型，对外提供 API]
+
+    style B fill:#e1f5ff
+    style D fill:#fff3cd
+    style F fill:#e8f5e9
+```
+
+下面逐个解释。
+
+**第一阶段：预训练（Pre-training）—— 博览群书**
+- **大白话**：把整个互联网的文本（网页、书籍、代码……）一股脑喂给模型，让它通过"预测下一个词"的游戏，自己摸索出语言规律和世界常识。
+- **类比**：像一个刚出生的孩子疯狂读书，还没人教怎么说话，但他已经"知书达理"了。
+- **为什么重要**：这是模型"知识"的主要来源。你问它"水的沸点""Python 怎么写循环"，这些基础认知都来自预训练。
+
+**第二阶段：有监督微调（SFT, Supervised Fine-Tuning）—— 岗前培训**
+- **大白话**：人工编写大量"高质量问答对"（问题 + 标准回答），专门教模型"用户这么问，你就该这么答"。
+- **类比**：新员工入职培训，HR 给他看标准话术："客户问退款，你就按这个模板回。"
+- **为什么重要**：预训练后的模型只是"知识渊博但不懂规矩"。SFT 让它学会**按人类指令办事、用对话的方式输出**。
+
+**第三阶段：RLHF（基于人类反馈的强化学习）—— 用户评价驱动优化**
+- **大白话**：让人类评审给模型的多个回答打分（"这个更好、这个有毒"），模型根据这些偏好，调整自己以后更偏向"安全、有用、得体"的回答。
+- **类比**：员工上岗后，公司收集用户好评差评，他慢慢学会"哪种回答用户更买账"。
+- **为什么重要**：这是模型变得"好用、不犯浑"的关键一步。没有它，模型可能满嘴冒犯性内容或拒绝正常请求。
+
+**这三阶段解释了你日常遇到的现象：**
+| 你遇到的现象 | 背后的原因 |
+|---|---|
+| 有时候答非所问、胡编 | 本质是"概率接龙"，预训练知识有盲区或接龙跑偏 |
+| 你指令（Prompt）写得越细，它答得越好 | SFT 教会它"听指令"，指令越清晰，它越知道你要啥 |
+| 它通常拒绝违法/有害请求 | RLHF 阶段人类给它打了"不安全 = 差评"的标签 |
+| 它语气自然、像人在聊 | SFT + RLHF 共同训练出的"对话人格" |
+
+> 一句话总结原理：**大模型 = 海量文本喂出来的"概率接龙机"，经过"博览群书 → 岗前培训 → 用户评价优化"三步，变成一个能听懂人话的助手。**
+
+---
+
+### 8.4 普通人如何开发大模型（关键纠偏）
+
+这是本章**最重要**的一节，请务必看清这条分界线。
+
+#### 8.4.1 两件事，千万别混为一谈
+
+很多小白被"学 AI"吓退，是因为把下面两件事当成了一件事：
+
+| 你以为的"做 AI" | 实际上的"做 AI 应用" |
+|---|---|
+| 训练 / 微调一个大模型 | 调用别人已经训练好的大模型 API |
+| 需要万张 GPU、TB 级数据、ML 博士团队 | 需要会写代码、会调接口、会写 Prompt |
+| 只有巨头和实验室能做 | **你，一个 Java/前端开发者，就能做** |
+
+- **训练 / 微调模型**：是从零（或基于开源底座）用海量数据把模型"教出来"。这确实是普通人的能力边界之外——烧钱、烧卡、烧人才。
+- **用模型做应用**：是站在巨人肩膀上，把现成模型当"发动机"，你负责造"汽车"（产品）。**本手册前 7 章讲的，全流程都是这件事。**
+
+#### 8.4.2 普通人的开发路径（就是本手册的脉络）
+
+你不是从"训练模型"开始，而是从"调用模型"开始，一步步往上搭：
+
+```mermaid
+flowchart LR
+    A[第2章 学 API 调用] --> B[第3章 Prompt 工程]
+    B --> C[第4章 RAG 知识库]
+    C --> D[第5章 Agent 智能体]
+    D --> E[第6章 生产化部署]
+    E --> F[第7章 读优秀源码]
+
+    style A fill:#e1f5ff
+    style F fill:#e8f5e9
+```
+
+- **第 2 章 API 调用**：学会用 HTTP 请求让模型"说话"（就像调一个远程服务）。
+- **第 3 章 Prompt 工程**：学会把指令写清楚，让模型听话、答得好。
+- **第 4 章 RAG 知识库**：给模型"外接大脑"，让它回答你私有的、最新的资料。
+- **第 5 章 Agent 智能体**：让模型学会"自己规划步骤、调用工具"去完成任务。
+- **第 6 章 生产化**：把玩具变成能扛流量的线上服务（限流、缓存、监控）。
+- **第 7 章 读源码**：看高手怎么写，抄作业、长内功。
+
+#### 8.4.3 一句定心丸
+
+> **你不需要懂模型是怎么训练的，也能做出很有价值的 AI 产品。**
+
+就像你用 MySQL 不需要懂 B+ 树的内部分裂算法，你用大模型也不需要懂 Transformer 的每一行公式。调用 API + 写好 Prompt + 组合业务，就足以做出帮人省时间、赚到钱的应用。
+
+---
+
+### 8.5 需要掌握的知识地图（分层表格）
+
+下面这张表，帮你**精确划定学习范围**。核心结论先说：**做"应用开发"，你只需"必学 + 进阶"，"可选"部分等真遇到需要时再学，完全不慌。**
+
+| 分类 | 知识点 | 是否必须 | 为什么（小白视角） |
+|---|---|---|---|
+| **必学** | HTTP / REST 基础 | 必须 | 调大模型本质就是发一个 HTTP 请求，不懂就调不通 |
+| **必学** | JSON 数据格式 | 必须 | 你和模型之间"对话"的请求/响应全是 JSON |
+| **必学** | 一门编程语言（Java / Python） | 必须 | 写应用总得有代码，你已有的 Java/前端基础直接够用 |
+| **必学** | 大模型 API 调用 | 必须 | 这是"用 AI"的入口，第 2 章核心 |
+| **必学** | 基本的 Prompt 写法 | 必须 | 指令写得好不好，直接决定回答质量，第 3 章核心 |
+| **进阶** | Embedding 与向量库 | 进阶 | 做 RAG 知识库必须懂"把文字变向量、按相似度搜"，第 4 章核心 |
+| **进阶** | RAG 原理 | 进阶 | 让模型回答私有/最新资料的关键套路 |
+| **进阶** | Function Calling（函数调用） | 进阶 | 让模型"调用你的接口/工具"的桥梁，Agent 基础 |
+| **进阶** | Agent 模式 | 进阶 | 让模型自主规划、串联多步任务，第 5 章核心 |
+| **可选** | 机器学习数学基础（线代/概率/微积分） | 可选 | 做应用几乎用不到，除非你想深入算法岗 |
+| **可选** | Transformer 细节（注意力公式等） | 可选 | 理解原理有帮助，但不妨碍你写应用 |
+| **可选** | 模型微调（Fine-tuning） | 可选 | 通常需要自有算力与数据，应用层很少自己微调 |
+| **可选** | CUDA / 分布式训练 | 可选 | 纯训练基础设施，应用开发者基本不碰 |
+
+**给小白的一句话总结**：
+
+> 把"必学"打牢（你大概率已经会大半了），把"进阶"学透（本手册第 4–5 章），"可选"先放一边——等哪天你想做更底层的优化，再回头补，完全来得及。别被"可选"吓住，那不是你的战场。
+
+---
+
+### 8.6 本章小结
+
+- 大模型 70 年主线：从 1956 概念诞生，到 2017 Transformer 立基，再到 2022 ChatGPT 普及、2025 便宜又聪明。
+- 大模型本质是**预测下一个词的"概率接龙机"**，不是全知全能。
+- 模型经历**预训练（博览群书）→ SFT（岗前培训）→ RLHF（用户评价优化）**三步才变好用。
+- **关键纠偏**：训练模型是巨头的事；你做的是"调 API 做应用"，前 7 章就是路径。
+- 知识地图：必学 + 进阶足够做出有价值的产品，可选部分按需再学。
+
+---
+
+### 8.7 自测题
+
+1. **（概念）** 请用你自己的话解释：大模型在生成回答时，本质上在做什么？为什么它会"一本正经地胡说"？
+2. **（历史）** 2017 年发表的《Attention Is All You Need》提出了什么结构？为什么说它是"大模型的基石"？今天哪些主流模型是它的"子孙"？
+3. **（原理）** 训练大模型的三个阶段分别是什么？请用一个比喻（如培养员工）分别说明每个阶段在"教模型什么"。
+4. **（纠偏）** 判断并说明理由：小明认为"学 AI 应用开发必须先学会训练自己的大模型"，这个说法对吗？普通开发者正确的切入点是什么？
+5. **（地图）** 在"必学 / 进阶 / 可选"三类中，各举出一个你**现在不必急着学**的例子，并说明为什么做应用开发可以暂时不碰它。
+
+---
+
+> 下一章预告：当你已经看清全景，我们会回到实战，深入某个具体方向的"最佳实践与避坑指南"。保持节奏，你已经比 90% 的围观群众更懂 AI 了。
+
+## 第 9 章：实战项目 —— 完整天气查询 Agent
+
+> 前面第 5 章你已经理解了 **Function Calling（函数调用）** 的原理：大模型本身不会查天气，但它能"看懂"你提供的工具描述，并在需要时输出一段结构化指令让你去执行。第 6、7、8 章我们又补齐了流式输出、RAG、多轮记忆等能力。
+>
+> 本章是一个**从 0 到 1 的实战整合项目**：你要亲手写出一个会"先调天气工具拿真实数据、再判断今天适不适合出门运动、最后用自然语言回答"的 AI Agent。它把第 5 章的工具调用、第 8 章的对话记忆概念串成一条完整可运行的链路。全程手把手，跟着做就能跑起来。
+
+---
+
+### 9.1 项目介绍与最终效果
+
+我们要做一个**天气出行运动助手 Agent**，用户用自然语言提问，例如：
+
+- "北京今天适合跑步吗？"
+- "上海现在天气怎么样，能不能带孩子去公园？"
+- "深圳下午会下雨吗，适合打羽毛球吗？"
+
+Agent 会：
+
+1. **自动判断**需要先去查天气（而不是凭空编答案）；
+2. **调用天气工具**拿到真实温度、天气状况、风速、湿度；
+3. **结合数据推理**，判断适宜度并给出穿衣/运动建议；
+4. 用**自然语言**把结论说清楚。
+
+最终你会得到一个 Spring Boot 后端（端口 8080）和一个极简 HTML 页面：在网页输入框打字，网页把问题发给后端，后端让大模型决定要不要调工具，工具查到真实天气后返回，模型组织成回答，前端展示出来。
+
+---
+
+### 9.2 整体架构
+
+下图展示整个系统的组件与数据流向。关键点是：**大模型不直接联网查天气**，它只负责"决策"和"组织语言"，真正的数据由我们写的 **Weather Tool（天气工具）** 提供。这正是第 5 章讲的工具调用范式。
+
+```mermaid
+flowchart LR
+    U["前端 / 浏览器\n(HTML + fetch)"] -->|"HTTP 提问"| B["Spring Boot 后端\n(端口 8080)"]
+    B -->|"带工具定义的请求"| M["大模型 API\n(DeepSeek / OpenAI)"]
+    M -->|"1) 决策：需要调工具\n返回 tool_call"| B
+    B -->|"2) 执行工具"| T["天气工具\nWeather Tool"]
+    T -->|"3) 调外部天气 API"| W["天气服务\nOpenWeatherMap / 和风天气"]
+    W -->|"JSON 天气数据"| T
+    T -->|"工具结果"| B
+    B -->|"4) 把结果回传给模型"| M
+    M -->|"5) 自然语言回答"| B
+    B -->|"HTTP 回答"| U
+```
+
+> 注意那 5 步：模型先说"我要查天气"（tool_call），后端真的去查，再把结果喂回模型，模型才吐出最终答案。这就是一个**最小可用的 Agent 闭环**。
+
+---
+
+### 9.3 环境准备
+
+#### 9.3.1 JDK 与构建工具
+
+- **JDK**：推荐 **17 或 21**（LangChain4j 1.x 与 Spring Boot 3.x 要求是 17+）。本章用 17。
+  - 验证：`java -version` 应显示 `17.x` 或 `21.x`。
+- **Maven**：3.8+，用于编译和启动。`mvn -version` 验证。
+
+如果你用 IDE（IntelliJ IDEA 社区版免费够用），直接导入 Maven 项目即可。
+
+#### 9.3.2 Maven 依赖：LangChain4j
+
+我们选用 **LangChain4j**（Java 生态里最成熟的 LLM 应用框架之一），它把"定义工具、创建 Agent、调用模型"封装得很干净。核心依赖两个：
+
+- `langchain4j`：核心包（`@Tool`、`AiServices` 等）
+- `langchain4j-open-ai`：兼容 OpenAI 协议的模型接入（**DeepSeek 也兼容该协议**，复用它即可）
+
+#### 9.3.3 申请天气 API Key
+
+本项目用 **OpenWeatherMap** 免费 tier（每月 10 万次调用，足够学习和小项目）。
+
+注册步骤：
+
+1. 打开 https://openweathermap.org/api ，点 **Sign Up** 注册免费账号。
+2. 注册后进入 **API keys** 页面（https://home.openweathermap.org/api_keys ）。
+3. 复制默认生成的 Key（形如 `a1b2c3...` 一长串）。**新 Key 生成后约 10 分钟~2 小时才生效**，别急着立刻测，先去睡个觉或继续写代码。
+4. （备选）如果你更想用国内服务，可改用 **和风天气**（https://dev.qweather.com ），注册后在「控制台 → 项目管理」创建项目拿 Key，免费版每天 1000 次，足够练习。
+
+> 小贴士：如果你暂时不想注册，本章 **9.6 节** 提供了"模拟天气数据"版本，把 Key 留空也能先把整条链路跑通，之后再换成真实 API。
+
+#### 9.3.4 申请大模型 Key
+
+- **DeepSeek（推荐，便宜好用）**：打开 https://platform.deepseek.com ，注册后在「API Keys」页面创建 Key。DeepSeek 兼容 OpenAI 协议，baseUrl 用 `https://api.deepseek.com/v1`，模型名用 `deepseek-chat`。
+- **OpenAI**：打开 https://platform.openai.com/api-keys 创建 Key，baseUrl 用官方默认即可。
+
+---
+
+### 9.4 项目目录结构
+
+完整建好后，目录长这样（`weather-agent` 为项目根目录）：
+
+```
+weather-agent/
+├── pom.xml
+├── README.md
+└── src
+    ├── main
+    │   ├── java
+    │   │   └── com/example/weatheragent
+    │   │       ├── WeatherAgentApplication.java   # 启动类
+    │   │       ├── WeatherAgent.java              # Agent 接口（AiServices）
+    │   │       ├── AgentConfig.java               # 装配模型与工具
+    │   │       ├── WeatherTools.java              # 天气工具（@Tool）
+    │   │       └── WeatherController.java          # REST 接口
+    │   └── resources
+    │       ├── application.yml                    # 配置（Key 走环境变量）
+    │       └── static
+    │           └── index.html                     # 极简前端
+    └── test
+        └── java/.../WeatherAgentApplicationTests.java
+```
+
+用命令一键生成骨架（任选其一）：
+
+```bash
+# 方式 A：直接用 mkdir 建目录（适合跟着敲）
+mkdir -p weather-agent/src/main/java/com/example/weatheragent
+mkdir -p weather-agent/src/main/resources/static
+mkdir -p weather-agent/src/test/java/com/example/weatheragent
+
+# 方式 B：用 Spring Initializr 网页生成后，把依赖改成下面 pom 的内容
+```
+
+---
+
+### 9.5 配置文件 application.yml
+
+**关键要求：Key 绝不写明文，统一走环境变量 `${WEATHER_API_KEY}` 和 `${DEEPSEEK_API_KEY}`。**
+
+```yaml
+server:
+  port: 8080
+
+# 天气 API 配置（Key 用环境变量，不在文件里写死）
+weather:
+  api-key: ${WEATHER_API_KEY}
+  base-url: https://api.openweathermap.org/data/2.5
+  # 若用和风天气，base-url 改为你申请的网关地址，并调整 WeatherTools 的解析逻辑
+
+# 大模型配置（DeepSeek，兼容 OpenAI 协议）
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY}
+  base-url: https://api.deepseek.com/v1
+  model-name: deepseek-chat
+```
+
+> **为什么用环境变量？** 把密钥写进代码或 `yml` 并提交到 Git，是新手最常见的"密钥泄露"事故。用 `${ENV}` 占位后，密钥只存在于你的运行环境中，代码可安全提交。运行前用 `export` 注入即可（见 9.9 节）。
+
+---
+
+### 9.6 天气工具类 WeatherTools
+
+这是项目的"手脚"：大模型说"去查天气"，就由它真去调外部 API。我们用 `@Tool` 注解声明它是可被模型调用的工具，**工具描述（description）写得越清楚，模型越知道何时该用它**——这点在 9.12 排查里还会强调。
+
+#### 9.6.1 真实版本（调 OpenWeatherMap）
+
+```java
+package com.example.weatheragent;
+
+import dev.langchain4j.agent.tool.Tool;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Map;
+
+@Component
+public class WeatherTools {
+
+    @Value("${weather.api-key}")
+    private String apiKey;
+
+    @Value("${weather.base-url}")
+    private String baseUrl;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    /**
+     * 模型在需要天气数据时会调用这个方法。
+     * @param city 城市名称（中文或英文均可，如 "北京" / "Beijing"）
+     */
+    @Tool("查询指定城市的当前实时天气，返回温度(摄氏度)、天气状况描述、湿度百分比、风速(米/秒)。"
+          + "当用户询问某城市今天/现在是否适合出门运动、跑步、带孩子去公园等时，必须先调用此工具获取真实数据。"
+          + "参数 city 为城市名。")
+    public String getWeather(String city) {
+        // OpenWeatherMap 当前天气接口
+        String url = String.format(
+                "%s/weather?q=%s&appid=%s&units=metric&lang=zh_cn",
+                baseUrl, city, apiKey);
+        try {
+            Map<String, Object> resp = restTemplate.getForObject(url, Map.class);
+            if (resp == null) {
+                return "天气服务返回为空。";
+            }
+            // OpenWeatherMap 用 cod 字段（200 为成功）返回状态码
+            Object cod = resp.get("cod");
+            if (cod != null && !"200".equals(cod.toString())) {
+                return "查询失败：" + resp.get("message");
+            }
+            Map<String, Object> main = (Map<String, Object>) resp.get("main");
+            double temp = toDouble(main.get("temp"));
+            int humidity = toInt(main.get("humidity"));
+
+            List<Map<String, Object>> weatherList =
+                    (List<Map<String, Object>>) resp.get("weather");
+            String desc = (String) weatherList.get(0).get("description");
+
+            Map<String, Object> wind = (Map<String, Object>) resp.get("wind");
+            double windSpeed = toDouble(wind.get("speed"));
+
+            String name = (String) resp.get("name");
+            return String.format(
+                    "城市：%s；当前温度：%.1f°C；天气：%s；湿度：%d%%；风速：%.1f m/s",
+                    name, temp, desc, humidity, windSpeed);
+        } catch (Exception e) {
+            return "查询天气时发生错误：" + e.getMessage();
+        }
+    }
+
+    private double toDouble(Object o) {
+        return o == null ? 0.0 : ((Number) o).doubleValue();
+    }
+
+    private int toInt(Object o) {
+        return o == null ? 0 : ((Number) o).intValue();
+    }
+}
+```
+
+#### 9.6.2 模拟数据版本（不想注册也能跑通）
+
+如果你还没拿到天气 Key，把上面的 `getWeather` 方法临时替换成下面这段"假数据"，整条 Agent 链路一样能跑，先建立信心：
+
+```java
+    @Tool("查询指定城市的当前实时天气，返回温度、天气状况、湿度、风速。")
+    public String getWeather(String city) {
+        // 模拟数据：按城市名简单返回一个稳定结果，方便先跑通链路
+        return String.format(
+                "城市：%s；当前温度：23.5°C；天气：晴；湿度：55%%；风速：2.8 m/s（模拟数据）",
+                city);
+    }
+```
+
+> 跑通后，再把 9.6.1 的真实实现换回来即可。
+
+---
+
+### 9.7 Agent 接口与装配
+
+#### 9.7.1 Agent 接口（含系统提示词）
+
+用 LangChain4j 的 `AiServices` 把"模型 + 工具"绑成一个接口。我们在接口方法上用 `@SystemMessage` 告诉模型它的角色与回答风格。
+
+```java
+package com.example.weatheragent;
+
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
+
+public interface WeatherAgent {
+
+    @SystemMessage("""
+            你是一个贴心、专业的出行运动助手。
+            当用户询问某城市是否适合出门运动（跑步、打球、带孩子去公园等）时，
+            你必须先调用 getWeather 工具获取该城市的真实天气数据，
+            然后结合温度、天气状况、风速、湿度判断适宜度，
+            最后用简洁的中文自然语言回答，并给出具体的穿衣与运动建议。
+            如果天气工具返回了失败信息，请如实告知用户无法获取天气，
+            不要编造数据。
+            """)
+    String chat(String userMessage);
+}
+```
+
+#### 9.7.2 装配配置（把模型与工具接起来）
+
+```java
+package com.example.weatheragent;
+
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.service.AiServices;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class AgentConfig {
+
+    @Bean
+    public WeatherAgent weatherAgent(
+            WeatherTools weatherTools,
+            @Value("${deepseek.api-key}") String apiKey,
+            @Value("${deepseek.base-url}") String baseUrl,
+            @Value("${deepseek.model-name}") String modelName) {
+
+        OpenAiChatModel model = OpenAiChatModel.builder()
+                .apiKey(apiKey)
+                .baseUrl(baseUrl)   // DeepSeek 的 OpenAI 兼容地址
+                .modelName(modelName)
+                .temperature(0.3)   // 调低一点，回答更稳
+                .build();
+
+        return AiServices.builder(WeatherAgent.class)
+                .chatLanguageModel(model)
+                .tools(weatherTools)   // 把天气工具交给模型
+                .build();
+    }
+}
+```
+
+#### 9.7.3 REST 控制器（对外提供 HTTP 接口）
+
+```java
+package com.example.weatheragent;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+public class WeatherController {
+
+    private final WeatherAgent weatherAgent;
+
+    public WeatherController(WeatherAgent weatherAgent) {
+        this.weatherAgent = weatherAgent;
+    }
+
+    @GetMapping("/api/chat")
+    public Map<String, String> chat(@RequestParam("message") String message) {
+        String answer = weatherAgent.chat(message);
+        return Map.of("answer", answer);
+    }
+}
+```
+
+#### 9.7.4 启动类
+
+```java
+package com.example.weatheragent;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class WeatherAgentApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(WeatherAgentApplication.class, args);
+    }
+}
+```
+
+#### 9.7.5 完整 pom.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>weather-agent</artifactId>
+    <version>1.0.0</version>
+    <name>weather-agent</name>
+
+    <properties>
+        <java.version>17</java.version>
+        <langchain4j.version>0.35.0</langchain4j.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+---
+
+### 9.8 极简前端页面（可选）
+
+把下面内容保存为 `src/main/resources/static/index.html`，Spring Boot 启动后会自动在 `http://localhost:8080/` 提供访问。它用原生 `fetch` 调我们的 `/api/chat`。
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天气出行运动助手</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; }
+        #answer { margin-top: 16px; padding: 16px; background: #f5f7fa; border-radius: 8px; min-height: 60px; }
+        input { width: 70%; padding: 8px; }
+        button { padding: 8px 16px; }
+    </style>
+</head>
+<body>
+    <h1>🌤️ 天气出行运动助手</h1>
+    <p>试试问："北京今天适合跑步吗？"</p>
+    <div>
+        <input id="msg" placeholder="输入你的问题..." />
+        <button onclick="ask()">问问看</button>
+    </div>
+    <div id="answer">（还没提问）</div>
+
+    <script>
+        async function ask() {
+            const msg = document.getElementById('msg').value;
+            if (!msg) return;
+            document.getElementById('answer').textContent = '思考中...';
+            const res = await fetch('/api/chat?message=' + encodeURIComponent(msg));
+            const data = await res.json();
+            document.getElementById('answer').textContent = data.answer;
+        }
+    </script>
+</body>
+</html>
+```
+
+---
+
+### 9.9 运行步骤与测试
+
+#### 9.9.1 注入密钥并启动
+
+先在终端里把密钥导进环境变量（只对本终端会话生效，不会写进文件）：
+
+```bash
+# macOS / Linux
+export WEATHER_API_KEY="你从 OpenWeatherMap 拿到的 Key"
+export DEEPSEEK_API_KEY="你从 DeepSeek 拿到的 Key"
+
+# 启动方式一：直接用 Maven 插件（无需先打包）
+mvn spring-boot:run
+
+# 启动方式二：先打包成 jar 再运行
+mvn clean package -DskipTests
+java -jar target/weather-agent-1.0.0.jar
+```
+
+启动后看到 `Started WeatherAgentApplication` 且没有报错，就说明成功了。
+
+#### 9.9.2 用 curl 测试
+
+打开另一个终端：
+
+```bash
+curl "http://localhost:8080/api/chat?message=%E5%8C%97%E4%BA%AC%E4%BB%8A%E5%A4%A9%E9%80%82%E5%90%88%E8%B7%91%E6%AD%A5%E5%90%97"
+```
+
+（上面那串 `%E5%8C%97...` 就是"北京今天适合跑步吗"的 URL 编码。也可以直接写中文，但建议用 `curl --get --data-urlencode` 更稳：）
+
+```bash
+curl --get "http://localhost:8080/api/chat" \
+     --data-urlencode "message=北京今天适合跑步吗？"
+```
+
+#### 9.9.3 预期输出长什么样
+
+一个**成功的真实数据**响应大致是：
+
+```json
+{
+  "answer": "我查了一下北京的实时天气：当前温度 18.5°C，天气为晴，湿度 42%，风速 3.1 m/s。这样的天气非常适宜跑步——气温舒适、空气干燥、几乎无风。建议穿薄运动长袖或速干短袖，跑步前做好 5 分钟热身即可。注意午后紫外线偏强，可备一顶帽子。"
+}
+```
+
+如果是**模拟数据版本**，回答里会带上"（模拟数据）"字样；如果你**故意不传工具结果或模型没调工具**，回答可能会编造数据——这正是我们 9.12 要排查的情况。
+
+> 用浏览器打开 `http://localhost:8080/` 也能直接体验前端页面，效果等价。
+
+---
+
+### 9.10 原理串联：一次天气问答的时序图
+
+下面这张时序图，把 9.2 的架构细化成"一次提问的完整往返"，**正好呼应第 5 章讲的 Function Calling 流程**：模型并不会自己联网，而是先"请求调工具"，等你执行完把结果喂回去，它才生成最终回答。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as 用户(浏览器)
+    participant B as Spring Boot 后端
+    participant M as 大模型 API(DeepSeek)
+    participant T as 天气工具 WeatherTools
+    participant W as 天气服务 OpenWeatherMap
+
+    U->>B: 提问"北京今天适合跑步吗？"
+    B->>M: 发送对话 + 工具定义(getWeather)
+    M-->>B: 决策：我需要天气 → 返回 tool_call(getWeather, city=北京)
+    B->>T: 执行 getWeather("北京")
+    T->>W: GET /weather?q=北京&appid=KEY
+    W-->>T: 返回 JSON(温度/天气/湿度/风速)
+    T-->>B: 工具结果(自然语言摘要)
+    B->>M: 把工具结果回传，请模型组织最终回答
+    M-->>B: 自然语言回答(适宜度+建议)
+    B-->>U: 返回 {answer: "..."}
+```
+
+对照第 5 章：第 3 步模型输出的 `tool_call` 就是 Function Calling；第 6 步把结果回传、让模型二次推理，就是"把函数执行结果再喂给模型"的标准两步式 Agent 模式。
+
+---
+
+### 9.11 扩展练习：做成个人助理
+
+你现在已经掌握了"模型 + 一个工具"的 Agent 范式。把它扩成**个人助理**，本质就是多挂几个 `@Tool` 类，呼应第 5 章的"多工具 / Agent"概念：
+
+1. **查日历工具**：加一个 `CalendarTools`，`@Tool` 方法 `getTodayEvents()` 调用 Google Calendar / 飞书日历 API，返回今天的日程。
+2. **发邮件工具**：加 `EmailTools`，`@Tool` 方法 `sendEmail(to, subject, body)`，用 JavaMail 或邮件服务 API 发送。
+3. **改 Agent 提示词**：在 `WeatherAgent` 的 `@SystemMessage` 里补充："你是一个个人助理，可调用天气、日历、邮件工具帮用户安排一天。"模型会**自动在多个工具里挑合适的那个**调用，甚至连续调多个工具（先查日历看有没有空，再查天气决定户外活动，最后发邮件邀请朋友）。
+
+> 进阶：当工具很多时，可以让模型"规划"再"执行"（ReAct / 计划型 Agent）；工具需要鉴权时，把各自 Key 也走环境变量注入即可。
+
+---
+
+### 9.12 常见问题排查
+
+| 现象 | 可能原因 | 解决办法 |
+| --- | --- | --- |
+| 启动报错 / 模型返回 **401** | Key 错误或没注入 | 确认 `export DEEPSEEK_API_KEY=...` 已执行；DeepSeek 的 Key 以 `sk-` 开头；检查 `baseUrl` 是否写成 `https://api.deepseek.com/v1`（少了 `/v1` 会 401） |
+| 天气接口返回 **401** | OpenWeatherMap Key 错误或**未生效** | 新 Key 有 10 分钟~2 小时延迟，等一等再试；确认 `WEATHER_API_KEY` 已导出；在浏览器直接访问接口 URL 验证 |
+| 天气接口返回 **429** | 触发限流（免费 tier 有每分钟/每月上限） | 降低请求频率；确认没在循环里狂调；OpenWeatherMap 免费版约 60 次/分钟，别压测 |
+| **Agent 不调工具**，直接编天气 | `@Tool` 的 description 写得太含糊 | 把 description 写具体，明确"何时必须调用"（参考 9.6.1 的描述）；同时确认 `AiServices...tools(weatherTools)` 已注册 |
+| 模型调了工具但参数城市为空 | 用户问题里没提城市，或提示词没引导 | 在系统提示里加"若用户未说明城市，请先反问"；或前端要求先选城市 |
+| 中文乱码 / 天气描述英文 | 接口没加 `lang=zh_cn` | 确认 `WeatherTools` 的 URL 带了 `&lang=zh_cn` |
+| 启动慢 / 首次调用卡很久 | 模型冷启动、网络到 DeepSeek 慢 | 正常现象；可加超时配置，或换响应更快的模型 |
+
+---
+
+### 9.13 本章自测题
+
+1. **架构理解**：本章的天气 Agent 中，大模型（DeepSeek）是直接联网查到天气数据的吗？如果不是，真实数据是谁提供的？请结合 9.2 架构图说明那 5 步闭环。
+2. **工具描述的作用**：为什么 `@Tool` 注解的 description 要尽量写清楚"何时该调用"？如果描述只写"查天气"三个字，可能会出什么问题（对照 9.12 排查表）？
+3. **时序填空**：根据 9.10 时序图，模型第一次返回给后端的是什么（A. 最终自然语言回答 / B. tool_call 指令 / C. 天气 JSON）？后端把工具结果喂回模型后，模型才返回什么？
+4. **安全实践**：为什么 `application.yml` 里用 `${WEATHER_API_KEY}` 而不直接写明文 Key？运行前需要怎么做才能让程序读到这个 Key？
+5. **扩展思考**：如果要给这个 Agent 加"查日历"和"发邮件"两个工具，让它变成个人助理，你需要做哪三件主要的事？这和第 5 章讲的哪种能力相呼应？
+
+---
+
+> **本章小结**：你完成了一个端到端可运行的 AI Agent——前端提问、Spring Boot 接收、LangChain4j 自动决定调天气工具、真实数据返回后由模型推理并自然回答。这正是第 5 章 Function Calling 在真实项目里的落地形态。把 9.11 的扩展练一练，你就拥有了一个会"自己想办法"的个人助理雏形。
+
+---
+
+## 第 10 章：实战项目（一）入门练手
+
+> 前两章你已经掌握了 RAG（第 4 章）、Agent 与工具调用（第 5 章）、流式输出与记忆（第 8 章），还在第 9 章完整跑通了一个天气 Agent。本章不再讲原理，而是**动手做 3 个真实能跑的小应用**，每个都从零搭到能访问。先求跑通，再求精致。
+
+### 10.1 个人知识库问答（RAG）
+
+#### 10.1.1 项目背景与最终效果
+
+你有一堆 PDF / Word / Markdown：**产品手册、内部制度、学习笔记**。直接问大模型，它会瞎编。本项目做一个「上传文档 → 提问 → 基于文档回答」的迷你知识库。
+
+最终效果：浏览器打开 `http://localhost:8080`，上传一个 PDF，输入框问「这份文档讲了什么 / 第 3 页提到的流程是什么」，页面返回**只基于你文档内容**的答案，并在后面附上它引用了哪些片段。
+
+谁用得上：客服知识助手、新人入职问答、个人笔记检索。
+
+#### 10.1.2 可运行代码案例
+
+**快速零依赖版（推荐先跑这个）**：用 `InMemoryEmbeddingStore`，embedding 用本地 ONNX 模型 `BgeSmallEnV15QuantizedEmbeddingModel`（**无需 API Key、无需数据库**）。聊天模型用本地 Ollama（`qwen2.5:3b` 等），也可以临时换成 `FakeChatModel` 纯离线看流程。
+
+Maven 依赖：
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>dev.langchain4j</groupId>
+        <artifactId>langchain4j</artifactId>
+        <version>1.0.0-beta3</version>
+    </dependency>
+    <dependency>
+        <groupId>dev.langchain4j</groupId>
+        <artifactId>langchain4j-open-ai</artifactId>
+        <version>1.0.0-beta3</version>
+    </dependency>
+    <dependency>
+        <groupId>dev.langchain4j</groupId>
+        <artifactId>langchain4j-embeddings-all-minilm-l6-v2</artifactId>
+        <version>1.0.0-beta3</version>
+    </dependency>
+    <dependency>
+        <groupId>dev.langchain4j</groupId>
+        <artifactId>langchain4j-document-loader</artifactId>
+        <version>1.0.0-beta3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+```
+
+> 说明：本地 embedding 模型 artifact 在不同小版本名称略有差异（如 `langchain4j-embeddings-all-minilm-l6-v2` 或 `langchain4j-embeddings-bge-small-en-v1.5`），以官方文档为准。
+
+核心 RAG 装配（内存版）：
+
+```java
+@Configuration
+public class RagConfig {
+    @Bean
+    public EmbeddingModel embeddingModel() {
+        // 本地模型，无需联网/Key
+        return new BgeSmallEnV15QuantizedEmbeddingModel();
+    }
+
+    @Bean
+    public EmbeddingStore embeddingStore() {
+        return new InMemoryEmbeddingStore<>();
+    }
+
+    @Bean
+    public EmbeddingStoreContentRetriever retriever(
+            EmbeddingStore store, EmbeddingModel model) {
+        return EmbeddingStoreContentRetriever.builder()
+                .embeddingStore(store)
+                .embeddingModel(model)
+                .maxResults(3)
+                .minScore(0.6)
+                .build();
+    }
+
+    @Bean
+    public ContentRetrieverAssistant assistant(
+            ChatLanguageModel chatModel, EmbeddingStoreContentRetriever retriever) {
+        return AiServices.builder(ContentRetrieverAssistant.class)
+                .chatLanguageModel(chatModel)
+                .contentRetriever(retriever)
+                .build();
+    }
+}
+```
+
+上传接口（解析 + 切片 + 向量化入库）：
+
+```java
+@RestController
+@RequestMapping("/kb")
+public class KbController {
+    @Autowired EmbeddingStore store;
+    @Autowired EmbeddingModel model;
+    @Autowired ContentRetrieverAssistant assistant;
+
+    @PostMapping("/upload")
+    public String upload(@RequestParam MultipartFile file) throws IOException {
+        Document doc = FileSystemDocumentLoader.loadDocument(
+                file.getResource().getFile().toPath(),
+                new PdfTextExtractor(), new DocumentSplitter());
+        // 简化：实际用 TextDocumentSplitter + 分块
+        List<Embedding> embeddings = model.embedAll(doc.textSegments()).content();
+        store.addAll(embeddings, doc.textSegments());
+        return "入库完成，片段数=" + doc.textSegments().size();
+    }
+
+    @GetMapping("/ask")
+    public String ask(@RequestParam String q) {
+        return assistant.answer(q);
+    }
+}
+```
+
+`application.yml`（本地 Ollama）：
+
+```yaml
+langchain4j:
+  ollama:
+    chat:
+      model-name: qwen2.5:3b
+      base-url: http://localhost:11434
+```
+
+> 没有 Ollama？把 `chatModel` 换成 `new FakeChatModel()` 即可纯离线跑通上传与检索流程（回答是占位文本，用来验证链路）。
+
+**Postgres + pgvector 真版本**（生产可用）：依赖换成 `langchain4j-embedding-store-pgvector`，`EmbeddingStore` 改为：
+
+```java
+@Bean
+public EmbeddingStore embeddingStore(DataSource ds) {
+    return PgVectorEmbeddingStore.builder()
+            .datasource(ds)
+            .table("knowledge")
+            .dimension(384)          // 与 embedding 维度一致
+            .build();
+}
+```
+
+启动说明：`docker run -e POSTGRES_PASSWORD=123 -p 5432:5432 ankane/pgvector`，建库后启动 Spring Boot，`/kb/upload` 上传、`/kb/ask` 提问。
+
+#### 10.1.3 实现原理
+
+数据流：上传文档 → 文本抽取 → 切成片段（Segment）→ 每个片段算向量 → 存入向量库；提问时把问题也算向量 → 在库里找最相似的片段 → 把片段拼进提示词 → 大模型基于片段作答。这就是第 4 章讲的 RAG 闭环。
+
+```mermaid
+flowchart LR
+    U["上传 PDF/MD"] --> E["抽取+切片\nDocumentSplitter"]
+    E --> V["算向量\nEmbeddingModel"]
+    V --> S[("向量库\nEmbeddingStore")]
+    Q["提问"] --> QV["问题算向量"]
+    QV --> R["相似度检索\nContentRetriever"]
+    R --> S
+    S --> P["拼接片段进提示词"]
+    P --> M["大模型回答\nAiServices"]
+    M --> A["带引用的答案"]
+```
+
+关键点：`minScore(0.6)` 是「相似度门槛」，低于它的片段不采用，避免答非所问；`maxResults(3)` 控制塞进提示词的片段数，太多会超 token 上限。
+
+#### 10.1.4 技术框架对比
+
+| 向量库 | 部署成本 | 规模上限 | 适用场景 |
+| --- | --- | --- | --- |
+| 内存 InMemory | 零，启动即用 | 几千条，重启清空 | 本地演示、单人小知识库 |
+| pgvector | 低，复用现有 PG | 百万级（需调优） | 已用 Postgres 的团队、中小应用 |
+| Chroma | 低，单进程/容器 | 千万级 | Python 生态、快速原型 |
+| Qdrant | 中，独立服务 | 亿级，性能强 | 高并发检索、生产检索服务 |
+| Milvus | 高，分布式集群 | 十亿级 | 超大规模、企业级向量平台 |
+
+**怎么选**：练手选内存；团队已有 Postgres 选 pgvector；要独立高性能检索服务选 Qdrant；上亿数据再考虑 Milvus。
+
+
+
+#### 10.1.5 真实技术栈适配（生产级 RAG）
+
+Demo 里我们用 `InMemoryEmbeddingStore` 跑通了流程，但它重启即丢、无法多人共享。生产环境要换成 **Postgres + pgvector**：Postgres 通过 `vector` 扩展提供向量列与余弦/内积距离检索，单库既能存业务数据又能存向量，运维成本最低。Embedding 模型也要换成真实服务——国内推荐阿里云百炼（DashScope）的 `text-embedding-v3`（维度 1024），或用 OpenAI `text-embedding-3-small`（维度 1536），由专门的 Embedding 模型把文本压成向量，再用 LLM（DeepSeek / Qwen / OpenAI）生成回答。
+
+先用 Docker 把数据库跑起来（只含 postgres+pgvector，设好密码、库名、端口）：
+
+```yaml
+# docker-compose.yml（仅数据库）
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: rag-pg
+    environment:
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: rag123456
+      POSTGRES_DB: ragdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d ragdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:
+```
+
+Spring Boot 配置通过环境变量注入密钥与连接串，避免硬编码：
+
+```yaml
+# application.yml
+spring:
+  datasource:
+    url: jdbc:postgresql://${PG_HOST:localhost}:${PG_PORT:5432}/${PG_DB:ragdb}
+    username: ${PG_USER:rag}
+    password: ${PG_PASSWORD:rag123456}
+    hikari:
+      maximum-pool-size: 10
+
+langchain4j:
+  embedding-model:
+    provider: dashscope          # 或 open-ai
+    api-key: ${EMBEDDING_API_KEY}
+    model-name: text-embedding-v3
+  chat-model:
+    provider: deepseek           # 或 qwen / open-ai
+    api-key: ${LLM_API_KEY}
+    model-name: deepseek-chat
+```
+
+生产化有几个关键坑。**分块策略**：用 `RecursiveCharacterTextSplitter`，按段落/句子递归切，建议 ~500 字/块、重叠 100 字，保证上下文不被切断又能命中。**维度一致性**：pgvector 建表的向量列维度是固定的，必须与 Embedding 模型输出维度完全一致（如 1024），否则写入会报错——这是最容易踩的坑。**连接池**用 Hikari 即可，上面的配置已含。**metadata 过滤**：给每个片段打上来源/时间标签，检索时可按 `Metadata.key("source").isEqualTo("xxx")` 缩小范围，比纯向量召回更准。
+
+下面是核心配置类，构建 `PgVectorEmbeddingStore` 与 `EmbeddingStoreContentRetriever` 两个 Bean：
+
+```java
+@Configuration
+public class RagConfig {
+
+    @Bean
+    public EmbeddingStore embeddingStore() {
+        return PgVectorEmbeddingStore.builder()
+                .host(System.getenv("PG_HOST") != null ? System.getenv("PG_HOST") : "localhost")
+                .port(5432)
+                .database("ragdb")
+                .user("rag")
+                .password(System.getenv("PG_PASSWORD") != null ? System.getenv("PG_PASSWORD") : "rag123456")
+                .table("embedding_store")
+                .dimension(1024)            // 必须与 embedding 模型维度一致
+                .useIndex(true)             // 建 ivfflat 索引加速
+                .build();
+    }
+
+    @Bean
+    public EmbeddingStoreContentRetriever contentRetriever(
+            EmbeddingStore store, EmbeddingModel embeddingModel) {
+        return EmbeddingStoreContentRetriever.builder()
+                .embeddingStore(store)
+                .embeddingModel(embeddingModel)
+                .maxResults(3)
+                .minScore(0.6)              // 相似度阈值，过滤噪声
+                .filter(Metadata.key("source").isEqualTo("manual")) // 可选 metadata 过滤
+                .build();
+    }
+}
+```
+
+> 不同小版本 API 可能略有差异（如 `PgVectorEmbeddingStore` 的 builder 字段名），以官方文档为准。
+
+#### 10.1.6 Docker 部署
+
+把应用打包成镜像，推荐**多阶段构建**：用 JDK 镜像编译（`mvn package`），再把 jar 拷到轻量 JRE 镜像运行，最终镜像小、启动快。记得暴露 8080，并加 `HEALTHCHECK` 探活。
+
+```dockerfile
+# 多阶段 Dockerfile
+FROM eclipse-temurin:17-jdk AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn -q dependency:go-offline
+COPY src ./src
+RUN mvn -q package -DskipTests
+
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+完整 `docker-compose.yml` 编排 `app` + `postgres`，app 通过 `depends_on` + healthcheck 等数据库就绪后再起，环境变量全部注入：
+
+```yaml
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: rag123456
+      POSTGRES_DB: ragdb
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d ragdb"]
+      interval: 5s
+      retries: 5
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports: ["8080:8080"]
+    environment:
+      PG_HOST: db
+      PG_USER: rag
+      PG_PASSWORD: rag123456
+      PG_DB: ragdb
+      EMBEDDING_API_KEY: ${EMBEDDING_API_KEY}
+      LLM_API_KEY: ${LLM_API_KEY}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      retries: 3
+```
+
+`.dockerignore` 避免把构建产物和无关文件打进镜像上下文：
+
+```text
+target/
+.git/
+.idea/
+*.iml
+Dockerfile
+docker-compose.yml
+```
+
+部署命令与建表提示：
+
+```bash
+docker build -t rag-app .          # 构建镜像
+docker compose up -d               # 后台启动 app + db
+docker compose logs -f app         # 看应用日志
+```
+
+注意：pgvector 的 `vector` 扩展需手动启用一次（`LangChain4j` 的 `PgVectorEmbeddingStore` 一般会自动建表，但扩展要库级开启）。进入数据库执行：
+
+```sql
+CREATE EXTENSION IF NOT EXISTS vector;
+```
+
+部署拓扑如下，浏览器经 8080 访问 app，app 通过内网访问 pgvector（5432）完成向量读写：
+
+```mermaid
+flowchart LR
+    Browser["浏览器<br/>index.html"] -- "HTTP / SSE :8080" --> App["rag-app 容器<br/>Spring Boot + LangChain4j"]
+    App -- "JDBC :5432" --> DB[("postgres + pgvector<br/>向量存储 / 相似检索")]
+    App -. "调用外部 API" .-> EMB["Embedding 模型<br/>百炼 / OpenAI"]
+    App -. "调用外部 API" .-> LLM["LLM<br/>DeepSeek / Qwen"]
+```
+
+#### 10.1.7 前端页面（上传文档 + 问答）
+
+把 Demo 补上两个接口即可联调完整闭环。先写**上传接口**：接收 multipart 文件，解析→切块→向量化→写入 `EmbeddingStore`。
+
+```java
+@RestController
+@RequestMapping("/documents")
+public class DocumentUploadController {
+
+    private final EmbeddingStore embeddingStore;
+    private final EmbeddingModel embeddingModel;
+
+    public DocumentUploadController(EmbeddingStore s, EmbeddingModel m) {
+        this.embeddingStore = s;
+        this.embeddingModel = m;
+    }
+
+    @PostMapping
+    public String upload(@RequestParam("file") MultipartFile file) throws IOException {
+        Document doc = FileDocumentLoader.load(file.getInputStream(),
+                new ApachePdfBoxDocumentParser());   // 按文件类型选解析器
+        RecursiveCharacterTextSplitter splitter = RecursiveCharacterTextSplitter.builder()
+                .chunkSize(500).chunkOverlap(100).build();
+        List<TextSegment> segments = splitter.split(doc);
+        embeddingStore.addAll(embeddingModel.embedAll(segments).content(), segments);
+        return "indexed: " + segments.size();
+    }
+}
+```
+
+**问答接口**用 LangChain4j 的 `TokenStream` 做流式返回，Spring 把它转成 `Flux<String>` 以 SSE（`text/event-stream`）推给前端逐字渲染：
+
+```java
+@RestController
+@RequestMapping("/chat")
+public class ChatController {
+
+    private final Assistant assistant;   // AiServices 生成的接口，方法返回 TokenStream
+
+    @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> chat(@RequestParam String message) {
+        return assistant.chatStream(message).toFlux();  // TokenStream -> Flux<String>
+    }
+}
+```
+
+前端用**单文件 `index.html`**（原生 HTML+JS，双击即可打开），含文件上传、聊天框、消息区，并通过 `fetch` + `ReadableStream` 消费 SSE 逐字渲染：
+
+```html
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>RAG 知识库</title><style>
+ body{font-family:sans-serif;max-width:760px;margin:auto;padding:20px}
+ #box{border:1px solid #ccc;border-radius:8px;padding:12px;height:360px;overflow:auto}
+ .me{color:#2563eb}.ai{color:#111}.row{margin:6px 0}
+</style></head><body>
+ <h2>个人知识库问答</h2>
+ <input id="file" type="file"><button onclick="upload()">上传文档</button>
+ <div id="box"></div>
+ <input id="msg" style="width:80%" placeholder="输入问题…">
+ <button onclick="ask()">发送</button>
+<script>
+ async function upload(){
+   const f=document.getElementById('file').files[0]; if(!f)return;
+   const fd=new FormData(); fd.append('file',f);
+   await fetch('http://localhost:8080/documents',{method:'POST',body:fd});
+   alert('上传完成');
+ }
+ async function ask(){
+   const q=document.getElementById('msg').value;
+   const box=document.getElementById('box');
+   box.innerHTML+=`<div class="row me">我：${q}</div>`;
+   const ai=document.createElement('div'); ai.className='row ai'; box.appendChild(ai);
+   const r=await fetch('http://localhost:8080/chat?message='+encodeURIComponent(q));
+   const reader=r.body.getReader(); const dec=new TextDecoder();
+   while(true){const {value,done}=await reader.read(); if(done)break;
+     ai.textContent+=dec.decode(value); box.scrollTop=box.scrollHeight;}
+ }
+</script></body></html>
+```
+
+前后端联调时，浏览器直接打开 `index.html` 属于跨域请求，后端需开启 CORS：在 Controller 上加 `@CrossOrigin` 或配一个全局 `WebMvcConfigurer` 的 `addCorsMappings` 放行 `*` 即可。
+
+### 10.2 AI 翻译 / 润色工具（带术语库）
+
+#### 10.2.1 项目背景与最终效果
+
+普通机器翻译会把你公司的专有名词翻错，比如把「算力平台」译成 "computing power platform" 而你们规范是 "Compute Engine"。本项目用**轻量 RAG** 把「术语表」注入提示词，保证译文**术语一致、格式受控**（如保留 `<tag>`、输出 JSON、不增删字段）。
+
+最终效果：POST 一段中文 + 目标语言，返回翻译，且术语 100% 命中词表；可切换「翻译 / 润色（只改表达不改意）」模式。
+
+谁用得上：技术文档本地化、产品文案、出海团队。
+
+#### 10.2.2 可运行代码案例
+
+术语表用 Markdown 维护，走和 10.1 一样的本地 embedding + 内存库（零依赖）。重点在提示词约束与 `@Tool` 兜底查术语。
+
+Maven 依赖同 10.1（加 `langchain4j-document-loader`）。术语表 `glossary.md`：
+
+```markdown
+算力平台 = Compute Engine
+用户画像 = User Profile
+灰度发布 = Canary Release
+```
+
+术语检索服务（同时作为 `@Tool` 让模型在不确定时主动查）：
+
+```java
+public class GlossaryTools {
+    private final EmbeddingStoreContentRetriever retriever;
+    public GlossaryTools(EmbeddingStoreContentRetriever r) { this.retriever = r; }
+
+    @Tool("根据中文术语查询官方英文译法，保证翻译一致性")
+    public String lookupTerm(@P("中文术语") String term) {
+        List<Content> hits = retriever.retrieve(term);
+        return hits.isEmpty() ? "未收录" : hits.get(0).textSegment().text();
+    }
+}
+```
+
+翻译助手接口与装配：
+
+```java
+public interface Translator {
+    @SystemMessage("""
+        你是技术文档翻译。规则：1) 术语必须遵循术语表；
+        2) 保留原文所有 <tag> 与占位符 {x}；3) 只输出译文，不解释。
+        """)
+    String translate(@UserMessage String text);
+}
+
+@Bean
+public Translator translator(ChatLanguageModel model, GlossaryTools tools) {
+    return AiServices.builder(Translator.class)
+            .chatLanguageModel(model)
+            .tools(tools)
+            .build();
+}
+```
+
+控制器：
+
+```java
+@RestController
+@RequestMapping("/t")
+public class TranslateController {
+    @Autowired Translator translator;
+    @PostMapping("/zh2en")
+    public Map<String,String> zh2en(@RequestBody Map<String,String> body) {
+        return Map.of("result", translator.translate(body.get("text")));
+    }
+}
+```
+
+`application.yml` 同 10.1（Ollama 或 `FakeChatModel` 离线跑通）。启动时把 `glossary.md` 像 10.1 那样入库即可。
+
+#### 10.2.3 实现原理
+
+两条保证一致性的路径并行：
+
+1. **提示词注入**：检索到相关术语片段，直接写进 SystemMessage，模型翻译时「看着词表翻」；
+2. **工具兜底**：模型遇到拿不准的词，主动调用 `@Tool lookupTerm` 查官方译法（第 5 章 Agent 范式）。
+
+格式约束靠 SystemMessage 强指令 + 输出抽样校验。
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant C as 控制器
+    participant A as Translator(AiServices)
+    participant R as 术语检索
+    participant T as GlossaryTools
+    participant M as 大模型
+    U->>C: 中文文本
+    C->>A: translate()
+    A->>R: 检索相关术语
+    R-->>A: 术语片段
+    A->>M: 提示词(术语+格式约束)
+    alt 模型不确定某词
+        M->>T: lookupTerm(词)
+        T->>R: 查词表
+        R-->>T: 官方译法
+        T-->>M: 译法
+    end
+    M-->>A: 译文
+    A-->>C: 结果
+    C-->>U: JSON
+```
+
+#### 10.2.4 技术框架对比
+
+| 方案 | 一致性 | 成本/速度 | 何时用 |
+| --- | --- | --- | --- |
+| 通用翻译（直译） | 差，术语易错 | 最低 | 临时、不重要的文本 |
+| 带术语库（轻量 RAG + 工具） | 好，可控 | 中，需维护词表 | 文档本地化、品牌术语统一 |
+| 微调专用模型 | 最好，批量稳定 | 高，训练+部署 | 海量固定领域、长期大规模 |
+
+**怎么选**：绝大多数团队用「带术语库」足够；只有日更上万字且术语极多时再考虑微调。
+
+### 10.3 流式打字机聊天前端
+
+#### 10.3.1 项目背景与最终效果
+
+第 8 章讲了流式原理。本项目把它做成**可见的打字机效果**：后端用 LangChain4j 流式接口，经 **SSE** 把 token 一个个推到前端，前端逐字渲染，并支持「停止 / 重试」。
+
+最终效果：浏览器聊天框，发消息后回答**逐字蹦出来**，点「停止」立即中断，点「重试」重新生成。
+
+谁用得上：所有需要「像 ChatGPT 一样流畅」的对话界面。
+
+#### 10.3.2 可运行代码案例
+
+后端用 `StreamingChatLanguageModel` + `TokenStream`，控制器用 Spring `Flux<String>` 经 `text/event-stream` 输出。
+
+Maven 依赖：在 10.1 基础上加 `spring-boot-starter-webflux`（或仅 web 也可，用 `Sinks` 桥接）。
+
+流式助手接口：
+
+```java
+public interface StreamingChat {
+    TokenStream chat(String message);
+}
+```
+
+控制器（TokenStream 桥接为 Flux，并支持取消）：
+
+```java
+@RestController
+@RequestMapping("/chat")
+public class ChatController {
+    @Autowired StreamingChat assistant;
+
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> stream(@RequestParam String message) {
+        Sinks.Many<String> sink = Sinks.many().unicast().onBackpressureBuffer();
+        TokenStream ts = assistant.chat(message);
+        ts.onNext(token -> sink.tryEmitNext(token))
+          .onComplete(() -> sink.tryEmitComplete())
+          .onError(e -> sink.tryEmitError(e))
+          .start();
+        return sink.asFlux();
+    }
+}
+```
+
+`application.yml`（Ollama 流式，或 OpenAI 流式模型）：
+
+```yaml
+langchain4j:
+  ollama:
+    streaming-chat:
+      model-name: qwen2.5:3b
+      base-url: http://localhost:11434
+```
+
+前端（fetch + ReadableStream 逐字渲染，带停止/重试）：
+
+```html
+<textarea id="q"></textarea>
+<button onclick="send()">发送</button>
+<button onclick="stop()">停止</button>
+<pre id="out"></pre>
+<script>
+let reader, ctrl;
+async function send() {
+  ctrl = new AbortController();
+  const res = await fetch('/chat/stream?message=' + encodeURIComponent(q.value),
+                          { signal: ctrl.signal });
+  reader = res.body.getReader(); const dec = new TextDecoder();
+  out.textContent = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    out.textContent += dec.decode(value);   // 逐字追加
+  }
+}
+function stop() { ctrl?.abort(); }           // 中断流
+</script>
+```
+
+启动说明：`mvn spring-boot:run`，浏览器打开页面即可。无 Ollama 时用任意支持流式的模型（OpenAI / 通义 / DeepSeek）替换配置。
+
+#### 10.3.3 实现原理
+
+后端 `StreamingChatLanguageModel` 在收到每个 token 时回调 `onNext`，我们把它塞进 Reactor 的 `Sinks.Many`，再以 SSE 持续推给浏览器；浏览器 `ReadableStream.read()` 循环取出片段追加到 DOM，形成打字机。`AbortController` 中断即关闭连接，后端流随即停止——这就是「停止」按钮的原理。
+
+```mermaid
+sequenceDiagram
+    participant B as 浏览器
+    participant C as 控制器(Flux)
+    participant M as 流式模型
+    B->>C: GET /chat/stream
+    C->>M: 发起流式请求
+    loop 每产生一个 token
+        M-->>C: onNext(token)
+        C-->>B: SSE 推送 token
+        B->>B: 追加到页面(打字机)
+    end
+    M-->>C: onComplete
+    C-->>B: 流结束
+    Note over B: 点停止→AbortController 中断连接
+```
+
+#### 10.3.4 技术框架对比
+
+| 方案 | 实时性 | 复杂度 | 双向通信 | 何时用 |
+| --- | --- | --- | --- | --- |
+| SSE（单向流） | 高，服务端→客户端 | 低，原生 HTTP | 否（客户端用 fetch 中断） | 打字机、日志推送、通知 |
+| WebSocket | 高，全双工 | 中，需握手/心跳 | 是 | 多人协作、游戏、双向高频 |
+| 普通轮询 | 低，有延迟 | 最低 | 否 | 极简场景、不支持长连接环境 |
+
+**怎么选**：纯「服务端往前端推文字」选 SSE 最省事；需要前端也频繁发消息且要低延迟双向（如实时协作）才上 WebSocket；老旧环境不支持长连接才用轮询。
+
+> 不同小版本 LangChain4j 的 `TokenStream` / `Sinks` 桥接写法可能略有差异，以官方文档为准。
+
+## 第 11 章：实战项目（二）核心能力
+
+本章把前面第 4 章 RAG、第 5 章工具调用、第 8/9 章多轮记忆与 Agent 串成三个真能跑的小项目。每个项目都给出「免注册」跑法：**装一个本地 Ollama（自带 qwen2.5 等开源模型），不需要任何付费 Key 也能把核心链路跑通**；想用 OpenAI/DeepSeek 的话，改一下 `application.yml` 即可。所有 LangChain4j 代码基于稳定 1.x；不同小版本 API 可能略有差异，以官方文档为准。
+
+### 11.1 智能客服 Bot（多轮 + 工具）
+
+#### 项目背景与最终效果
+
+做一个电商场景的**智能客服 Bot**：用户连续问「我的订单到哪了」「那这款手机还有货吗」，Bot 能记住上下文（上一句在聊订单 A），并调用后台工具查订单、查库存，而不是瞎编。跑起来是一个 Spring Boot 接口（`POST /api/cs/chat`），前端每次把一句话发过来，后端维护按用户隔离的多轮会话，返回自然语言回答。谁用得上：需要 7×24 自动应答、且要接自己业务系统（订单/库存）的团队。
+
+> 关键认知：Bot 不会直接查数据库，它通过我们写的 `@Tool` 方法去查；多轮上下文靠 `ChatMemory` 自动拼接历史消息，开发者不用手动拼 prompt。
+
+#### 可运行代码案例
+
+Maven 依赖（复用第 9 章的基座，新增 memory/ollama 支持）：
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>dev.langchain4j</groupId>
+        <artifactId>langchain4j-spring-boot-starter</artifactId>
+        <version>1.0.0-beta3</version>
+    </dependency>
+    <dependency>
+        <groupId>dev.langchain4j</groupId>
+        <artifactId>langchain4j-open-ai</artifactId>
+        <version>1.0.0-beta3</version>
+    </dependency>
+    <dependency>
+        <groupId>dev.langchain4j</groupId>
+        <artifactId>langchain4j-ollama-spring-boot-starter</artifactId>
+        <version>1.0.0-beta3</version>
+    </dependency>
+</dependencies>
+```
+
+`application.yml`（默认走本地 Ollama，零 Key；有 Key 时把 provider 切到 openai）：
+
+```yaml
+app:
+  llm:
+    provider: ollama            # ollama | openai
+    ollama-base-url: http://localhost:11434
+    ollama-model: qwen2.5:7b
+    openai-api-key: ${OPENAI_API_KEY:}
+    openai-model: gpt-4o-mini
+server:
+  port: 8080
+```
+
+业务工具（mock 数据，免注册也能验证工具调用链路）：
+
+```java
+public class OrderTools {
+    @Tool("根据订单号查询物流状态")
+    public String queryOrder(@P("订单号") String orderId) {
+        // 真实项目里这里查你的订单库 / 调用物流 API
+        return "订单 " + orderId + " 已发货，预计明天 18:00 前送达（杭州中转仓）";
+    }
+}
+
+public class InventoryTools {
+    @Tool("根据商品名查询库存数量")
+    public String queryStock(@P("商品名称") String product) {
+        return "商品「" + product + "」当前可用库存：37 件";
+    }
+}
+```
+
+`AiServices` 接口 + 会话配置（按 `userId` 隔离记忆，`MessageWindowChatMemory` 只保留最近 N 条，防止上下文无限膨胀）：
+
+```java
+public interface CustomerServiceBot {
+    @SystemMessage("你是电商客服，善用工具查订单/库存，回答简洁友好。")
+    String chat(@MemoryId String userId, @UserMessage String userMessage);
+}
+
+@Configuration
+class BotConfig {
+    @Bean CustomerServiceBot bot(AppProperties p) {
+        ChatLanguageModel model = p.llm().isOllama()
+            ? OllamaChatModel.builder().baseUrl(p.llm().ollamaBaseUrl())
+                .modelName(p.llm().ollamaModel()).build()
+            : OpenAiChatModel.builder().apiKey(p.llm().openaiApiKey())
+                .modelName(p.llm().openaiModel()).build();
+        return AiServices.builder(CustomerServiceBot.class)
+            .chatLanguageModel(model)
+            .chatMemoryProvider(userId -> MessageWindowChatMemory.withMaxMessages(20))
+            .tools(new OrderTools(), new InventoryTools())
+            .build();
+    }
+}
+```
+
+REST 控制器（每次请求带 `userId` 即可获得连续多轮记忆）：
+
+```java
+@RestController
+@RequestMapping("/api/cs")
+public class CsController {
+    private final CustomerServiceBot bot;
+    public CsController(CustomerServiceBot bot) { this.bot = bot; }
+
+    @PostMapping("/chat")
+    public Map<String,String> chat(@RequestBody ChatReq req) {
+        return Map.of("reply", bot.chat(req.userId(), req.message()));
+    }
+    public record ChatReq(String userId, String message) {}
+}
+```
+
+启动说明：先装 Ollama 并 `ollama pull qwen2.5:7b`，再 `mvn spring-boot:run`，用 curl 连发两条：
+`curl -XPOST localhost:8080/api/cs/chat -H'Content-Type: application/json' -d '{"userId":"u1","message":"查订单 A123 到哪了"}'` 与 `"那这款手机还有货吗"`，第二条会沿用第一条的语境。
+
+#### 实现原理
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant C as 控制器
+    participant M as ChatMemory
+    participant L as 大模型
+    participant T as @Tool 工具
+    U->>C: 第2轮消息(userId=u1)
+    C->>M: 取出 u1 的历史(含第1轮)
+    C->>L: 历史+新问题(带工具定义)
+    L->>L: 判断需要查库存
+    L-->>C: tool_call: queryStock("手机")
+    C->>T: 执行 queryStock
+    T-->>C: "库存 37 件"
+    C->>L: 把工具结果回传
+    L-->>C: 自然语言回答
+    C->>M: 写入本轮问答
+    C-->>U: 回答
+```
+
+大白话：`ChatMemory` 像给每个用户配了个「小本本」，每轮把用户问、模型答都记下来；下次提问时自动把小本本翻出来一起喂给模型，模型就「记得」前文。`@Tool` 方法本质是给模型一份「能力说明书」，模型觉得该查库存时就按约定格式喊一声，我们代码里真去查，再把结果还给模型收尾。
+
+#### 技术框架对比
+
+| 记忆实现 | 优点 | 缺点 | 适用场景 |
+| --- | --- | --- | --- |
+| 内存 `InMemoryChatMemoryStore` | 零依赖、读写最快 | 重启即丢、无法跨实例 | 本地演示、单实例原型 |
+| Redis `RedisChatMemoryStore` | 跨实例共享、可持久化、易扩容 | 需引入 Redis、有网络开销 | 多实例部署的生产客服 |
+| JDBC `JdbcChatMemoryStore` | 数据落库、便于审计与合规 | 需数据库、写入稍慢 | 金融/医疗等强审计场景 |
+
+选型口诀：先内存跑通原型；要横向扩容上 Redis；要合规留痕用 JDBC。
+
+---
+
+
+
+#### 真实技术栈适配（生产级客服）
+
+Demo 阶段我们用内存版 `MessageWindowChatMemory` 维护多轮上下文，应用一重启记忆就清空，且所有用户共用一份记忆——这显然无法上生产。生产级客服要把「记忆」按 `sessionId` 隔离并持久化：优先选 Redis（`langchain4j-redis` 的 `RedisChatMemoryStore`，低延迟、天然带 TTL），若公司已有 Postgres 也可选用 `JdbcChatMemoryStore`。核心思路是提供一个 `ChatMemoryProvider`，根据每次请求的 `sessionId` 返回（或新建）独立记忆实例。
+
+工具后端也要从 mock 升级为真实调用。原来的 `@Tool` 方法里写死返回，现在改为注入 `OrderService` / `InventoryService`，内部用 Spring 的 `RestClient`（或响应式 `WebClient`）调用内部订单/库存 API，并设置超时与降级（如调用失败时返回「系统繁忙，请稍后」）。`@Tool` 注解与参数描述保持不变，LLM 仍按语义决定何时调用。
+
+若还想要 FAQ 知识库能力，可叠加 RAG：用 Postgres 的 `pgvector` 扩展存向量，通过 `EmbeddingStoreContentRetriever` 在回答前先检索标准问答。装配时用 `AiServices` 一次性串起 `chatLanguageModel` + `chatMemoryProvider` + tools + 可选 `contentRetriever`。
+
+```yaml
+# application.yml
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  datasource:
+    url: jdbc:postgresql://${PG_HOST:localhost}:5432/${PG_DB:csbot}
+    username: ${PG_USER:postgres}
+    password: ${PG_PASSWORD:postgres}
+
+langchain4j:
+  openai:
+    api-key: ${LLM_API_KEY}
+    base-url: ${LLM_BASE_URL:https://api.deepseek.com/v1}  # DeepSeek/Qwen/OpenAI 二选一
+    model-name: ${LLM_MODEL:deepseek-chat}
+  embedding:
+    openai:
+      api-key: ${EMBED_API_KEY}
+      model-name: ${EMBED_MODEL:text-embedding-3-small}
+```
+
+```java
+// AiServices 装配（生产级）
+@Configuration
+public class AssistantConfig {
+
+    @Bean
+    public ChatMemoryProvider chatMemoryProvider(RedisChatMemoryStore store) {
+        return sessionId -> MessageWindowChatMemory.builder()
+                .id(sessionId)                 // 按 sessionId 隔离会话
+                .maxMessages(20)
+                .chatMemoryStore(store)        // 持久化到 Redis
+                .build();
+    }
+
+    @Bean
+    public CustomerAssistant assistant(ChatLanguageModel model,
+                                       ChatMemoryProvider memoryProvider,
+                                       OrderService orderService,
+                                       InventoryService inventoryService,
+                                       ContentRetriever retriever) {
+        return AiServices.builder(CustomerAssistant.class)
+                .chatLanguageModel(model)
+                .chatMemoryProvider(memoryProvider)
+                .tools(orderService, inventoryService)   // 真实后端 @Tool
+                .contentRetriever(retriever)             // 可选 FAQ RAG
+                .build();
+    }
+}
+```
+
+```java
+// 真实工具后端（保留 @Tool）
+@Service
+public class OrderService {
+
+    private final RestClient rest = RestClient.builder()
+            .baseUrl("${ORDER_API:http://order-svc}")
+            .build();
+
+    @Tool("根据订单号查询订单状态与物流信息")
+    public String queryOrder(@P("订单号") String orderId) {
+        try {
+            return rest.get().uri("/orders/{id}", orderId)
+                    .retrieve().body(String.class);
+        } catch (Exception e) {
+            return "查询订单失败，请稍后再试";   // 降级
+        }
+    }
+}
+```
+
+> 不同小版本 API 可能略有差异（如 `RedisChatMemoryStore` 构造参数、`AiServices` 链式方法名），以官方文档为准。
+
+#### Docker 部署
+
+生产部署推荐多阶段构建：第一阶段用 `eclipse-temurin:17-jdk` 编译打包，第二阶段用 `eclipse-temurin:17-jre` 仅运行 jar，镜像更小、更安全。容器暴露 8080，并用 `HEALTHCHECK` 探活 Spring Boot Actuator 的 `/actuator/health`（需在依赖里开启 `spring-boot-starter-actuator` 并暴露 health）。
+
+`docker-compose.yml` 编排三个服务：`app` 运行客服后端，`redis` 持久化多轮记忆，`postgres`（带 `pgvector` 镜像 `ankane/pgvector`）支撑 FAQ RAG。app 通过 `depends_on` 声明依赖，环境变量（LLM key、Redis/PG 地址）从宿主机注入，端口映射 `8080:8080`。`.dockerignore` 排除 `target`、`.git` 等避免污染构建上下文。
+
+```dockerfile
+# 多阶段 Dockerfile
+FROM eclipse-temurin:17-jdk AS build
+WORKDIR /app
+COPY . .
+RUN ./gradlew bootJar || mvn -q package   # 按构建工具二选一
+
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar app.jar
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
+ENTRYPOINT ["java","-jar","app.jar"]
+```
+
+```yaml
+# docker-compose.yml
+services:
+  app:
+    build: .
+    ports: ["8080:8080"]
+    depends_on: [redis, postgres]
+    environment:
+      REDIS_HOST: redis
+      PG_HOST: postgres
+      LLM_API_KEY: ${LLM_API_KEY}
+      EMBED_API_KEY: ${EMBED_API_KEY}
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+  postgres:
+    image: ankane/pgvector:latest
+    environment:
+      POSTGRES_DB: csbot
+      POSTGRES_PASSWORD: postgres
+    ports: ["5432:5432"]
+```
+
+```text
+# .dockerignore
+target/
+.git/
+*.md
+```
+
+部署命令与说明：`docker build -t cs-bot .` 构建镜像；`docker compose up -d` 后台启动三容器。查看日志用 `docker compose logs -f app`。首次启动需初始化 PG 的 `pgvector` 扩展（`CREATE EXTENSION IF NOT EXISTS vector;`）并灌入 FAQ 向量；Redis 无需初始化，记忆会随会话自动写入。
+
+```mermaid
+graph LR
+  B[浏览器/前端] -->|HTTP SSE /chat| A[app :8080<br/>客服后端]
+  A -->|读取/写入 会话记忆| R[(redis<br/>ChatMemoryStore)]
+  A -->|向量检索 FAQ| P[(postgres+pgvector<br/>EmbeddingStore)]
+  A -->|调用 LLM| L[DeepSeek/Qwen/OpenAI]
+  A -->|@Tool 查订单/库存| S[内部 REST 服务]
+```
+
+#### 前端页面（客服聊天组件）
+
+后端需要一个流式接口让前端逐字显示。新增 `ChatController`，接收 `POST /chat?sessionId=xxx`，内部用 `AiServices` 返回 `TokenStream`，以 `text/event-stream` 流式吐字；同一 `sessionId` 走同一个 `ChatMemoryProvider` 即自动多轮。为了让前端在「机器人思考中」显示「🔧 正在查订单…」，可在 `@Tool` 方法里打印日志或借助回调，在最简单的实现中由后端在 SSE 开头先发一条自定义事件 `event: tool` 告知当前调用的工具名。
+
+```java
+@RestController
+@CrossOrigin   // 允许前端跨域访问
+public class ChatController {
+
+    private final CustomerAssistant assistant;
+
+    public ChatController(CustomerAssistant assistant) {
+        this.assistant = assistant;
+    }
+
+    @PostMapping(value = "/chat", produces = "text/event-stream")
+    public SseEmitter chat(@RequestParam String sessionId,
+                           @RequestBody String message) {
+        SseEmitter emitter = new SseEmitter(0L);
+        TokenStream stream = assistant.chat(sessionId, message);
+        stream.onNext(token -> {
+            try { emitter.send(SseEmitter.event().data(token)); } catch (Exception ignored) {}
+        }).onComplete(emitter::complete).onError(emitter::completeWithError).start();
+        return emitter;
+    }
+}
+```
+
+前端用单个 `index.html`（原生 HTML+JS，无需任何构建工具）即可。顶部展示当前 `sessionId`（页面加载时随机生成 UUID，刷新即换会话）；主体是消息气泡列表、输入框与发送/停止按钮；通过 `fetch` + `ReadableStream` 消费 SSE，把增量 token 拼到机器人气泡里实现逐字渲染；发送工具指示时，可在回答区上方临时显示「🔧 正在调用：查订单」。
+
+```html
+<!doctype html>
+<html lang="zh">
+<head><meta charset="utf-8"><title>智能客服</title>
+<style>
+ body{font-family:system-ui;max-width:720px;margin:auto;padding:16px}
+ #box{border:1px solid #ddd;border-radius:8px;height:60vh;overflow:auto;padding:12px}
+ .me,.bot{margin:8px 0;padding:8px 12px;border-radius:12px;max-width:80%}
+ .me{background:#d6eaff;margin-left:auto}.bot{background:#f1f1f1}
+ #hint{color:#888;font-size:13px;margin:6px 0}
+ input{flex:1;padding:8px;border:1px solid #ccc;border-radius:6px}
+ .row{display:flex;gap:8px;margin-top:8px}
+ button{padding:8px 14px;border:0;border-radius:6px;background:#2d7ff9;color:#fff}
+</style></head>
+<body>
+ <div>当前会话：<code id="sid"></code></div>
+ <div id="hint"></div>
+ <div id="box"></div>
+ <div class="row"><input id="msg" placeholder="输入问题，如：我的订单 SF123 到哪了？">
+   <button id="send">发送</button><button id="stop">停止</button></div>
+<script>
+ const sid = crypto.randomUUID();
+ document.getElementById('sid').textContent = sid;
+ let ctrl;
+ const box = document.getElementById('box');
+ function bubble(cls){const d=document.createElement('div');d.className=cls;box.appendChild(d);return d;}
+
+ document.getElementById('send').onclick = async () => {
+   const text = document.getElementById('msg').value; if(!text) return;
+   document.getElementById('msg').value='';
+   const me = bubble('me'); me.textContent = text;
+   const bot = bubble('bot');
+   ctrl = new AbortController();
+   const res = await fetch('/chat?sessionId='+sid, {
+     method:'POST', headers:{'Content-Type':'text/plain'},
+     body:text, signal:ctrl.signal
+   });
+   const reader = res.body.getReader(), dec = new TextDecoder();
+   while(true){
+     const {value,done}=await reader.read(); if(done) break;
+     const chunk = dec.decode(value);
+     chunk.split('\n\n').forEach(line=>{
+       if(line.startsWith('event: tool')){
+         document.getElementById('hint').textContent='🔧 '+line.split('data:')[1].trim();
+       } else if(line.startsWith('data:')){
+         bot.textContent += line.slice(5); box.scrollTop=box.scrollHeight;
+       }
+     });
+   }
+   document.getElementById('hint').textContent='';
+ };
+ document.getElementById('stop').onclick = ()=> ctrl && ctrl.abort();
+</script>
+</body></html>
+```
+
+记得后端开启 CORS（如上 `@CrossOrigin`，或在配置类注册 `CorsConfiguration` 允许前端域名），否则浏览器会拦截 SSE 请求。把该 `index.html` 放到静态目录或任意 HTTP 服务即可直接打开使用。
+
+### 11.2 文档 / 网页批量摘要与对比
+
+#### 项目背景与最终效果
+
+运营/产品经理常要把 N 篇竞品文档或网页**各自摘要、再横向对比**。本项目做一个批处理接口：`POST /api/summary/batch`，传入若干文本，后端对每篇做摘要，最后产出一份「横向对比表」。跑起来：调用后几秒内返回每篇要点 + 综合对比。可叠加第 4 章的 RAG 做长文分块，重点是**并发提速**和**成本控制**。
+
+#### 可运行代码案例
+
+长文本分块（超过模型上下文就切段，逐段摘要再合并），并发用线程池 `CompletableFuture`：
+
+```java
+@Service
+public class BatchSummaryService {
+    private final ChatLanguageModel model;
+    private final ExecutorService pool = Executors.newFixedThreadPool(8);
+
+    public BatchResult summarize(List<String> docs) {
+        List<CompletableFuture<String>> futures = docs.stream()
+            .map(doc -> CompletableFuture.supplyAsync(() -> summarizeOne(doc), pool))
+            .toList();
+        List<String> summaries = futures.stream()
+            .map(CompletableFuture::join).toList();
+        return new BatchResult(summaries, compare(summaries));
+    }
+
+    private String summarizeOne(String doc) {
+        List<String> chunks = chunk(doc, 2000);   // 按 ~2000 字切块
+        String merged = chunks.stream()
+            .map(c -> model.generate("请用3句话摘要：" + c).content().text())
+            .collect(Collectors.joining("\n"));
+        return model.generate("合并为最终摘要：" + merged).content().text();
+    }
+    // chunk() 简单按长度切；真实长文建议用 RecursiveCharacterTextSplitter
+}
+```
+
+成本控制（用 token 计数预估花费，超阈值直接拒绝，避免半夜账单爆炸）：
+
+```java
+TokenCountEstimator estimator = model.defaultTokenCountEstimator();
+int totalTokens = docs.stream().mapToInt(estimator::estimateTokens).sum();
+if (totalTokens > 50_000) {
+    throw new IllegalArgumentException("本次约 " + totalTokens + " tokens，超出预算上限");
+}
+```
+
+> 想上 Java 21 的虚拟线程？把上面 `Executors.newFixedThreadPool(8)` 换成 `Executors.newVirtualThreadPerTaskExecutor()` 即可，写法不变、吞吐更高（见下方对比表）。
+
+控制器与启动：写好 `BatchSummaryService` 后接一个 `@PostMapping("/api/summary/batch")` 收 `List<String>`，返回 JSON。本地 Ollama 下 `mvn spring-boot:run`，用 curl 传两三段文本即可看到各自摘要与对比。
+
+#### 实现原理
+
+```mermaid
+flowchart LR
+    A[批量文档] --> B[切分任务]
+    B --> P["线程池 / 虚拟线程\n并发提交"]
+    P --> M1[模型:摘要 doc1]
+    P --> M2[模型:摘要 doc2]
+    P --> M3[模型:摘要 docN]
+    M1 & M2 & M3 --> C[汇总摘要]
+    C --> R[生成横向对比]
+    R --> O[返回 JSON]
+```
+
+大白话：串行是一个接一个摘要，N 篇就等 N 倍时间；并发是把每篇摘要当独立任务丢进线程池，多个摘要同时飞向模型，总耗时≈最慢那一篇。token 计数则是「先称重量再发货」，防止一次喂太多把额度烧光。
+
+#### 技术框架对比
+
+| 方案 | 吞吐 | 复杂度 | 适用场景 |
+| --- | --- | --- | --- |
+| 串行 for 循环 | 低、耗时=Σ单篇 | 最低 | 文档少（<10）、调试阶段 |
+| 线程池 `ExecutorService` | 高、可控并发数 | 中 | Java 17 主流选择（本章默认） |
+| 虚拟线程（Loom） | 最高、写法像同步 | 低，但需 Java 21+ | 已升级 Java 21 的服务 |
+| 响应式（Project Reactor） | 高、背压友好 | 高、心智负担大 | 已有 WebFlux 技术栈 |
+
+选型口诀：Java 17 用线程池最稳；上了 21 就换虚拟线程几乎零成本；别为了「显得先进」硬上响应式。
+
+---
+
+### 11.3 AI 联网问答（RAG + 实时搜索）
+
+#### 项目背景与最终效果
+
+知识库 RAG（第 4 章）解决「内部文档问答」，但回答不了「今天发生了什么」。本项目加一个**网络搜索工具**：模型先决定要搜什么，工具返回实时网页片段，模型据此作答并**标注来源 `[1][2]`**。跑起来：`POST /api/web/ask` 问「最近大模型圈有什么新闻」，返回带引用的回答。无 Key 时用 mock 搜索直接返回固定条目，照样验证「检索→喂模型→引注」链路。
+
+#### 可运行代码案例
+
+网络搜索工具（mock 版，真实版把 `// TODO` 换成调用搜索 API 并解析）：
+
+```java
+public class WebSearchTools {
+    @Tool("联网搜索关键词，返回若干带编号的网页片段")
+    public String webSearch(@P("搜索关键词") String query) {
+        // 真实版：调 Bing/SearXNG/SerpApi，解析出 title+snippet+url
+        return """
+            [1] 《开源模型新进展》... 某团队发布 70B 开源模型，推理成本降 40%。
+            [2] 《Agent 落地实践》... 多家企业把 Agent 接入客服，人工量降 60%。
+            """;
+    }
+}
+```
+
+RAG 内容检索器（可叠加你的私有知识库，`EmbeddingStoreContentRetriever` 负责按相似度取片段）：
+
+```java
+ContentRetriever retriever = EmbeddingStoreContentRetriever.builder()
+    .embeddingStore(embeddingStore)     // 你的向量库(InMemory/PgVector...)
+    .embeddingModel(embeddingModel)     // 如 Ollama 的 nomic-embed-text
+    .maxResults(3)
+    .minScore(0.6)
+    .build();
+```
+
+组装助手（同时挂工具 + 内容检索器，并强制标注来源）：
+
+```java
+public interface WebAssistant {
+    @SystemMessage("回答时务必用 [1][2] 标注引用自检索结果，禁止编造来源。")
+    String ask(@UserMessage String question);
+}
+
+WebAssistant assistant = AiServices.builder(WebAssistant.class)
+    .chatLanguageModel(model)
+    .contentRetriever(retriever)   // 私有知识库 RAG
+    .tools(new WebSearchTools())   // 实时联网
+    .build();
+```
+
+控制器 + 启动同上，`@PostMapping("/api/web/ask")` 收问题返回回答。本地 Ollama 跑通后，把 `WebSearchTools` 里的 mock 换成真实搜索 API 即升级为生产版。
+
+#### 实现原理
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant A as WebAssistant
+    participant R as 内容检索器(RAG)
+    participant W as webSearch 工具
+    participant L as 大模型
+    U->>A: 提问
+    A->>R: 检索私有知识库
+    R-->>A: 相关片段
+    A->>L: 片段+问题(带工具)
+    L->>L: 片段不够新→决定联网
+    L-->>A: tool_call: webSearch("大模型 新闻")
+    A->>W: 执行搜索
+    W-->>A: 编号网页片段
+    A->>L: 片段回传
+    L-->>A: 带 [1][2] 引用的回答
+    A-->>U: 回答
+```
+
+大白话：先在自己的知识库里翻（RAG），翻不到最新消息就派「搜索工具」去网上捞，捞回来的片段原样编号喂给模型，模型引用时直接写 `[1]` 指第一条——这样用户能溯源，也不会让模型把陈年旧闻当新闻。
+
+#### 技术框架对比
+
+| 方案 | 优点 | 缺点 | 适用场景 |
+| --- | --- | --- | --- |
+| 纯知识库 RAG | 答案可控、数据不出内网、合规 | 知识更新慢、覆盖有限 | 企业私有文档 / 制度问答 |
+| 联网 RAG | 时效性强、覆盖广 | 受外部源质量/可用性影响 | 新闻、实时行情、热点 |
+| 混合检索（RAG+联网） | 兼顾权威与时效、互补 | 实现复杂、token/成本更高 | 既要实时又要可信的场景 |
+
+选型口诀：问「公司规定」用纯知识库；问「今天怎么了」用联网；两者都要就混合，但记得给成本设上限。
+
+## 第 12 章：实战项目（三）进阶工程
+
+> 前几章你已掌握 RAG（第 4 章）、Agent 与工具调用（第 5 章）、多轮与工具（第 11 章），并做过天气 Agent（第 9 章）。这一章把"领域约束 + 结构化输出 + 多 Agent 协作 + 多模态流水线"串成三个可运行项目，全部基于 Java 17 + Spring Boot 3 + LangChain4j 1.x。
+>
+> 通用约定：密钥一律走环境变量 `${DEEPSEEK_API_KEY}`，不写进 `application.yml`；DeepSeek 兼容 OpenAI 协议，复用 `langchain4j-open-ai` 即可。全部项目都提供"免注册 mock 版"，没有付费 Key 也能把核心链路跑通。
+
+### 12.1 代码审查 / SQL 生成助手（领域 Agent）
+
+#### 12.1.1 项目背景与最终效果
+
+团队里很多同学写 SQL 或业务代码时，希望有个"资深同事"帮忙看一眼：有没有安全问题、会不会慢查询、SQL 能不能更规范。本项目做一个**领域审查助手**：输入一段 Java 代码或一条 SQL，输出**结构化**的审查报告——问题清单（含严重等级）、修改建议、以及（可选的）安全改写后的 SQL。
+
+跑起来长这样：浏览器或 Postman 发一个 POST 请求，带上待审查文本，后端返回一段 JSON：
+
+```json
+{
+  "summary": "发现 1 处高危问题",
+  "issues": [
+    { "severity": "HIGH", "type": "SQL注入", "line": 3,
+      "suggestion": "使用预编译 PreparedStatement 替代字符串拼接" }
+  ],
+  "safeSql": "SELECT * FROM user WHERE name = ?",
+  "autoExecuted": false
+}
+```
+
+谁用得上：后端开发、DBA 初审、Code Review 辅助。关键是**只给建议、绝不自动执行**——这是领域 Agent 最重要的安全边界。
+
+#### 12.1.2 可运行代码案例
+
+**Maven 依赖**（在 `pom.xml` 引入 BOM 锁定 1.x 版本）：
+
+```xml
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>dev.langchain4j</groupId>
+      <artifactId>langchain4j-bom</artifactId>
+      <version>1.0.1</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
+<dependencies>
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+  </dependency>
+  <dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j</artifactId>
+  </dependency>
+  <dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j-open-ai</artifactId>
+  </dependency>
+</dependencies>
+```
+
+**application.yml**：
+
+```yaml
+server:
+  port: 8080
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY}
+  base-url: https://api.deepseek.com/v1
+  model-name: deepseek-chat
+```
+
+**结构化输出 POJO**（让模型按字段回填，比自由文本可靠得多）：
+
+```java
+public class ReviewResult {
+    public String summary;
+    public List<Issue> issues = new ArrayList<>();
+    public String safeSql;          // 安全改写后的 SQL，可能为 null
+    public boolean autoExecuted = false; // 永远是 false：本助手绝不自动执行
+
+    public static class Issue {
+        public String severity;     // HIGH / MEDIUM / LOW
+        public String type;
+        public int line;
+        public String suggestion;
+    }
+}
+```
+
+**Agent 接口 + 领域系统提示词**（强调安全约束）：
+
+```java
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
+
+public interface CodeReviewAgent {
+
+    @SystemMessage("""
+        你是一名资深 Java/SQL 安全审查专家。
+        请审查用户提交的代码或 SQL，仅以结构化字段返回结果：
+        summary 一句话总结；issues 列出每个问题（severity 限 HIGH/MEDIUM/LOW、
+        type、line、suggestion）；若发现可安全改写的 SQL，填入 safeSql。
+        安全红线：你只提供建议与改写示例，绝对不能自动执行任何 SQL 或代码，
+        autoExecuted 必须固定为 false。对不确定的地方如实说明，不要编造。
+        """)
+    @UserMessage("请审查以下内容：\n{{content}}")
+    ReviewResult review(@V("content") String content);
+}
+```
+
+**装配与控制器**（mock 版：把 base-url / key 留空时，用假数据代替，见下方说明）：
+
+```java
+@Configuration
+class AgentConfig {
+    @Bean
+    CodeReviewAgent codeReviewAgent(@Value("${deepseek.api-key:}") String key,
+                                    @Value("${deepseek.base-url}") String baseUrl,
+                                    @Value("${deepseek.model-name}") String model) {
+        if (key == null || key.isBlank()) {           // 免注册：返回 mock 实现
+            return content -> mockReview(content);
+        }
+        ChatLanguageModel llm = OpenAiChatModel.builder()
+                .baseUrl(baseUrl).apiKey(key).modelName(model).build();
+        return AiServices.create(CodeReviewAgent.class, llm);
+    }
+}
+@RestController
+class ReviewController {
+    @Autowired CodeReviewAgent agent;
+    @PostMapping("/review") ReviewResult review(@RequestBody String code) {
+        return agent.review(code);
+    }
+}
+```
+
+> 不同小版本 API 可能略有差异，以官方文档为准。若 `AiServices` 无法自动把 POJO 转成 JSON 模式，可改用 `JsonOutputConverter<ReviewResult>` 显式约束：在 `UserMessage` 中传入 `JsonOutputConverter` 并 `from(text, converter)` 解析，效果一致。
+
+#### 12.1.3 实现原理
+
+用户提交代码 → 控制器转发 → `CodeReviewAgent` 把领域系统提示词 + 用户输入发给大模型 → 模型在 **JSON 模式 / response_format** 约束下回填 `ReviewResult` 各字段 → 框架反序列化成 POJO 返回。整个过程中模型只"出主意"，删除、执行 SQL 的动作由人工或 CI 流水线在外部完成，助手本身没有任何写权限。
+
+```mermaid
+flowchart LR
+    U["开发者 / CI"] -->|"POST 代码或 SQL"| C["ReviewController"]
+    C --> A["CodeReviewAgent"]
+    A -->|"领域提示词 + 用户输入\n(开启 JSON 模式)"| M["大模型"]
+    M -->|"结构化 JSON 回填字段"| A
+    A -->|"ReviewResult POJO"| C
+    C -->|"JSON 报告"| U
+    A -. "红线：autoExecuted=false\n绝不自动执行" .- X["外部人工/CI 才执行"]
+```
+
+#### 12.1.4 技术框架对比
+
+| 方案 | 可靠性 | 结构化程度 | 适用场景 |
+| --- | --- | --- | --- |
+| 自由文本输出 | 低，需自己正则/解析 | 无，纯文本 | 临时问答、人读即可 |
+| JSON Schema 约束（POJO 返回） | 高，字段必填可校验 | 强，直接反序列化 | 要进系统/落库的结果（本项目） |
+| 专用结构化输出 API（如函数调用返回对象） | 最高，模型专为结构优化 | 强 | 复杂嵌套、强约束生产环境 |
+
+一句话：只要结果还要被程序消费，就用结构化输出；人看一眼就完事的，自由文本更省事。
+
+---
+
+### 12.2 多 Agent 协作（研究员 + 写作者）
+
+#### 12.2.1 项目背景与最终效果
+
+单 Agent 什么都想干，容易"顾此失彼"：既要上网找资料、又要写长文，常常跑偏或超长。本项目拆成两个**单一职责**的 Agent：
+
+- **研究员（Researcher）**：带"搜索/读取"工具，负责收集素材，产出一份结构化的素材简报（要点列表）。
+- **写作者（Writer）**：只管把素材写成流畅报告，不自己搜资料。
+
+跑起来：POST 一个主题（如"2025 年 Java 生态趋势"），后端先让研究员搜集 3~5 条素材，再把素材交给写作者生成一篇中文报告。谁用得上：内容运营、周报/调研初稿、竞品分析。
+
+#### 12.2.2 可运行代码案例
+
+**研究员 Agent**（带 mock 搜索工具）：
+
+```java
+public interface ResearcherAgent {
+    @SystemMessage("""
+        你是研究员，负责围绕主题收集素材。
+        必须调用 search 工具获取资料，然后返回 3~5 条要点，
+        每条含来源与一句话摘要，不要写长篇。
+        """)
+    String research(@UserMessage("{{topic}}") @V("topic") String topic);
+
+    // 工具：真实场景可接搜索 API；这里用 mock 文本让无 Key 也能跑
+    @Tool("根据关键词搜索资料，返回若干条带来源的素材摘要。")
+    default String search(String keyword) {
+        return "[mock] 关于「" + keyword + "」的素材：\n"
+             + "1. 来源A：Java 21 虚拟线程已稳定落地。\n"
+             + "2. 来源B：Spring Boot 3 成为新项目默认。\n"
+             + "3. 来源C：AI 辅助编码渗透率快速提升。";
+    }
+}
+```
+
+**写作者 Agent**：
+
+```java
+public interface WriterAgent {
+    @SystemMessage("""
+        你是专业写作者。仅根据提供的素材撰写一篇 300 字左右的中文报告，
+        结构清晰、语言通顺，不要编造素材之外的数据。
+        """)
+    String write(@UserMessage("主题：{{topic}}\n素材：\n{{material}}")
+                 @V("topic") String topic, @V("material") String material);
+}
+```
+
+**编排类（把两个 Agent 串起来）**：
+
+```java
+@Service
+class ResearchOrchestrator {
+    private final ResearcherAgent researcher;
+    private final WriterAgent writer;
+
+    public ResearchOrchestrator(ResearcherAgent r, WriterAgent w) {
+        this.researcher = r; this.writer = w;
+    }
+
+    public String run(String topic) {
+        String material = researcher.research(topic); // 第一步：搜集
+        return writer.write(topic, material);         // 第二步：撰写
+    }
+}
+
+@RestController
+class ReportController {
+    @Autowired ResearchOrchestrator orch;
+    @PostMapping("/report") String report(@RequestBody String topic) {
+        return orch.run(topic);
+    }
+}
+```
+
+**装配**：同 12.1，无 Key 时用 mock——研究员直接返回上面 `search` 的 mock 文本，写作者仍可正常调用模型（或也降级为模板拼接）。重点是**编排逻辑不依赖是否有真实搜索 API**。
+
+#### 12.2.3 实现原理
+
+编排类先调研究员，研究员内部通过 `@Tool` 拿到素材；素材作为字符串传入写作者，写作者只做"组织语言"。两个 Agent 彼此隔离，职责单一，便于分别调参与替换（比如给研究员换更强的搜索源，不影响写作者）。
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant O as 编排类
+    participant R as 研究员 Agent
+    participant T as search 工具(mock)
+    participant W as 写作者 Agent
+    participant M as 大模型
+    U->>O: POST 主题
+    O->>R: research(topic)
+    R->>M: 提示词+工具定义
+    M-->>R: 决定调用 search
+    R->>T: search(topic)
+    T-->>R: 素材文本
+    R-->>O: 素材简报
+    O->>W: write(topic, material)
+    W->>M: 仅基于素材撰写
+    M-->>W: 报告
+    W-->>O: 报告
+    O-->>U: 最终报告
+```
+
+#### 12.2.4 技术框架对比
+
+| 方案 | 复杂度 | 可控性 | 适用场景 |
+| --- | --- | --- | --- |
+| 单 Agent | 低，一个提示词搞定 | 中，长任务易跑偏 | 简单问答、单一任务 |
+| 多 Agent（本项目） | 中，多个 AiServices + 编排 | 高，职责分离易调参 | 资料收集+创作等分工任务 |
+| 工作流编排框架（LangGraph 类思路） | 高，需图/状态机 | 最高，支持分支/回退/人工确认 | 企业级多步、需容错与可观测 |
+
+原则：能单 Agent 解决就别拆；拆完仍线性串接就用本项目写法；若出现循环、条件分支、需要人工介入，再上编排框架。
+
+---
+
+### 12.3 会议录音 → 转写 → 摘要 → 待办（多模态）
+
+#### 12.3.1 项目背景与最终效果
+
+开会最怕两件事：没记下来、记了不会跟。本项目做一条**流水线**：上传/粘贴一段会议文本（真实场景可接 ASR 语音识别）→ 大模型生成摘要并抽取**结构化待办**（谁、做什么、截止时间）。为了让无语音环境也能跑，ASR 用 **mock 文本**代替真实语音识别，核心链路完全打通。
+
+跑起来：POST 一段会议记录文本，返回：
+
+```json
+{
+  "summary": "讨论了 V2 上线计划与分工",
+  "todos": [
+    { "owner": "张三", "task": "整理上线 checklist", "due": "周五" },
+    { "owner": "李四", "task": "压测报告", "due": "下周三" }
+  ]
+}
+```
+
+谁用得上：团队例会、客户沟通纪要、个人速记。
+
+#### 12.3.2 可运行代码案例
+
+**ASR 转写（mock 版，真实可换 Whisper/云端 API）**：
+
+```java
+@Component
+public class Transcriber {
+    // 真实场景：接收音频字节，调 Whisper / 云端 ASR 返回文本
+    // 这里用 mock，让没有语音文件也能跑通
+    public String transcribe(String audioRefOrText) {
+        if (audioRefOrText.startsWith("MOCK::")) {
+            return audioRefOrText.substring(6);
+        }
+        return "（mock 转写）今天我们讨论 V2 上线：张三负责 checklist，周五前；"
+             + "李四出压测报告，下周三；王五跟进客户反馈。";
+    }
+}
+```
+
+**摘要与待办 Agent（结构化输出）**：
+
+```java
+public class MeetingSummary {
+    public String summary;
+    public List<Todo> todos = new ArrayList<>();
+    public static class Todo {
+        public String owner;
+        public String task;
+        public String due;
+    }
+}
+
+public interface MeetingAgent {
+    @SystemMessage("""
+        你是会议纪要助手。阅读会议文本，输出一句话 summary，
+        并从对话中抽取 todos：每条含 owner（负责人）、task（事项）、due（截止）。
+        只抽取明确提到的，不确定不要编。
+        """)
+    @UserMessage("会议内容：\n{{text}}")
+    MeetingSummary summarize(@V("text") String text);
+}
+```
+
+**流水线类（Pipeline）**：
+
+```java
+@Service
+class MeetingPipeline {
+    private final Transcriber transcriber;
+    private final MeetingAgent agent;
+
+    public MeetingPipeline(Transcriber t, MeetingAgent a) {
+        this.transcriber = t; this.agent = a;
+    }
+
+    public MeetingSummary run(String input) {
+        String text = transcriber.transcribe(input); // 1. ASR 转写
+        return agent.summarize(text);                // 2. 摘要 + 待办抽取
+    }
+}
+
+@RestController
+class MeetingController {
+    @Autowired MeetingPipeline pipeline;
+    @PostMapping("/meeting") MeetingSummary meeting(@RequestBody String input) {
+        return pipeline.run(input);
+    }
+}
+```
+
+**装配**：有真实 ASR 时把 `Transcriber.transcribe` 换成调 API；模型装配同 12.1，`AiServices.create(MeetingAgent.class, llm)`。
+
+#### 12.3.3 实现原理
+
+典型**多模态流水线**：音频 →（ASR）→ 文本 →（LLM 结构化）→ 摘要+待办。ASR 与 LLM 是两段独立能力，用 `MeetingPipeline` 像水管一样串接，任一段都可单独替换（如换本地 Whisper 不影响摘要逻辑）。
+
+```mermaid
+flowchart LR
+    A["音频 / 文本输入"] --> T["Transcriber\n(ASR，mock 可跑)"]
+    T -->|"纯文本"| M["MeetingAgent\n(大模型结构化)"]
+    M -->|"MeetingSummary\n(summary + todos)"| R["MeetingController"]
+    R -->|"JSON"| U["用户 / 项目管理工具"]
+```
+
+#### 12.3.4 技术框架对比
+
+| 方案 | 成本 | 隐私 | 适用场景 |
+| --- | --- | --- | --- |
+| 云端 ASR API（如各大厂语音） | 按量付费，低门槛 | 低，音频上传第三方 | 快速上线、非敏感会议 |
+| 本地 Whisper | 一次性算力成本，需 GPU/CPU | 高，数据不出内网 | 敏感会议、内网部署 |
+| 开源模型（Whisper 变体/飞书类开源） | 中，自托管 | 高 | 既要可控又想免授权费 |
+
+取舍口诀：怕泄密、可上机器 → 本地/开源；图省事、内容不敏感 → 云端 API。
+
+## 知识库维护信息
+
+> 本节用于资料库治理。维护人需按下方「季度维护清单」定期检查文档有效性。
+
+| 项目 | 内容 |
+|------|------|
+| **文档状态** | ✅ 有效 |
+| **文档版本** | v2.3 |
+| **维护人** | 【待指定】建议由本文档创建者或团队中熟悉 Java + AI 应用开发的成员认领 |
+| **维护人联系方式** | （请填写：企业微信 / 邮箱） |
+| **最后更新时间** | 2025 年 7 月 |
+| **下次例行检查** | 2025 年 10 月（之后每季度一次） |
+
+### 季度维护清单（每季度执行一次）
+
+- [ ] 核对第 0 章「主流大模型对比表」：模型名称、上下文长度、中文能力是否变化
+- [ ] 核对各章 API 价格（输入 / 输出 $/百万 token）是否为最新
+- [ ] 核对 DeepSeek / OpenAI 请求体格式、字段（如 `response_format`、`tools`）是否有调整
+- [ ] 核对第 4 章 Embedding 模型对比、第 5 章框架对比（LangChain4j / Spring AI）是否仍准确
+- [ ] 如模型 / 价格 / API 有重大变化，更新正文后将**版本号 +1**（如 v2.3 → v2.4），并以「文件名带版本」的形式重新上传资料库
+- [ ] 检查文档是否出现重复、冲突或缺少负责人的内容，按需在资料库标注「有效 / 待更新 / 已废弃」
+
+### 说明
+
+- 本文档定位为「团队 AI 应用开发入门与参考手册」，状态标记为**有效**，可供团队成员检索复用。
+- AI 领域迭代极快，文中价格、模型能力、API 格式均为编写时（2025 年 7 月）的快照，**落地前请以各官网最新信息为准**。
+- 如发现内容过时或错误，请在资料库评论或联系维护人，由维护人统一更新，避免多人各自修改导致版本混乱。
+
+
 ## 附录 A：推荐资源清单
 
 ### 免费课程
@@ -3192,4 +5702,4 @@ spec:
 
 ---
 
-*本手册 v2.0 | 2025 年 7 月 | 如有问题或建议，请联系知识库维护人*
+*本手册 v2.3 | 2025 年 7 月 | 如有问题或建议，请联系知识库维护人*
