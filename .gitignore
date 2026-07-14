@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# 编辑器
+.idea/
+.vscode/
+*.swp
+
+# 依赖 / 构建（如将来加 Demo 工程）
+node_modules/
+target/
+*.class

@@ -1,0 +1,3195 @@
+# 🤖 AI/大模型应用开发学习手册 —— 从零开始（深度版）
+
+> **面向读者**：有 Java / 前端编程基础，想系统学习大模型应用开发的小白  
+> **学习目标**：理解底层原理、掌握技术选型、能独立搭建 AI 聊天应用、知识库问答系统（RAG）、智能体（Agent）并具备生产化能力  
+> **预计总时长**：约 60 小时（每周 5 小时，约 12 周完成）  
+> **编写日期**：2025 年 7 月  
+> **版本**：v2.0（深度修订版）
+
+---
+
+## 目录
+
+- [前言：这份手册怎么用](#前言这份手册怎么用)
+- [第 0 章：概念扫盲 —— 大模型到底是什么](#第-0-章概念扫盲--大模型到底是什么)
+- [第 1 章：环境准备 —— 动手前的准备工作](#第-1-章环境准备--动手前的准备工作)
+- [第 2 章：第一个 AI 应用 —— 跑通你的第一个聊天机器人](#第-2-章第一个-ai-应用--跑通你的第一个聊天机器人)
+- [第 3 章：Prompt 工程入门 —— 学会和 AI 好好说话](#第-3-章prompt-工程入门--学会和-ai-好好说话)
+- [第 4 章：RAG 知识库问答 —— 让 AI 读懂你的文档](#第-4-章rag-知识库问答--让-ai-读懂你的文档)
+- [第 5 章：Function Calling 与 Agent —— 让 AI 动手干活](#第-5-章function-calling-与-agent--让-ai-动手干活)
+- [第 6 章：流式输出与生产化 —— 从 Demo 到上线](#第-6-章流式输出与生产化--从-demo-到上线)
+- [第 7 章：GitHub 实战项目推荐 —— 向优秀开源项目学习](#第-7-章github-实战项目推荐--向优秀开源项目学习)
+- [附录 A：推荐资源清单](#附录-a推荐资源清单)
+- [附录 B：常见问题 FAQ](#附录-b常见问题-faq)
+- [附录 C：Java AI 工具栈速查](#附录-cjava-ai-工具栈速查)
+- [附录 D：术语表](#附录-d术语表)
+- [学习检查清单](#学习检查清单)
+
+---
+
+## 前言：这份手册怎么用
+
+### 这是一份"深度版"手册
+
+相比常见的"跑通 Demo 就完事"的入门教程，本手册 v2.0 更强调**理解原理、技术对比、工程落地**：
+
+- **讲原理**：Transformer 注意力机制、BPE 分词、Embedding 向量数学、采样参数、RAG 检索链路、ReAct 推理循环——不仅告诉你"怎么做"，更告诉你"为什么这么做"。
+- **做对比**：每个关键技术点都给出横向对比表（DeepSeek vs GPT-4o vs Claude、向量库选型、限流算法、记忆类型……），帮你建立"选型直觉"。
+- **配图表**：全手册包含大量 **Mermaid 架构图 / 时序图 / 流程图**，把抽象流程可视化。
+- **给代码**：每个核心能力都提供**接近可运行的 Java（Spring Boot / LangChain4j）和 Python 代码**，多数场景给出"裸调 API"与"用框架"两种写法。
+
+> 💡 阅读建议：图解是快速建立直觉的利器，代码是验证理解的标尺。建议**先读图和原理，再自己把代码敲一遍**——能改出 bug 并修复，才算真懂。
+
+### 适合谁？
+
+| 你的情况 | 建议读法 |
+|----------|---------|
+| 完全小白，连 ChatGPT 都没用过 | 从第 0 章逐字读，重点看原理图和自测题 |
+| 用过 ChatGPT，了解基本概念 | 快速扫第 0 章，从第 1 章开始动手 |
+| 已能调 API 但想深入 | 直奔第 4、5 章（RAG / Agent）与第 6 章（生产化） |
+| Java 工程师想落地 AI 项目 | 第 2、4、5、6 章为主，框架优先 LangChain4j / Spring AI |
+
+### 学习路径速览
+
+```
+第 0 章（3h）  概念 + 原理：Transformer / Token / Embedding / 采样
+    ↓
+第 1 章（2h）  环境：JDK 选型 / API Key 安全 / 连通性验证
+    ↓
+第 2 章（5h）  第一个应用：架构 + 四种调用方式 + 多轮对话 + 前端
+    ↓
+第 3 章（4h）  Prompt 工程：四要素 / CoT / 结构化输出 / 模板管理
+    ↓
+第 4 章（10h） RAG：切片 / Embedding / 向量库 / 重排 / 混合检索 ⭐
+    ↓
+第 5 章（10h） Function Calling + Agent：ReAct / 记忆 / 多 Agent ⭐
+    ↓
+第 6 章（8h）  生产化：SSE 流式 / 语义缓存 / 限流 / 可观测 / 部署
+    ↓
+第 7 章（持续） GitHub 项目：边读源码边学，反哺前 6 章
+```
+
+### 学习原则
+
+1. **先跑通，再深究**——代码跑起来比看懂公式更重要，但不要止步于"能跑"。
+2. **每章必动手 + 必做自测题**——自测题是检验理解的最低门槛。
+3. **遇到报错是好事**——每个报错都在暴露你的某个认知盲区。
+4. **对比着学**——看到推荐方案时，顺手看看"为什么不选另一个"。
+5. **沉淀成自己的文档**——把踩坑、调参经验记下来，这本手册也会随之生长。
+
+---
+
+## 第 0 章：概念扫盲 —— 大模型到底是什么
+
+> 本章目标：在你动手调第一个 API 之前，先建立一套"心智模型"。你不需要会推导公式、不需要懂反向传播，但你必须知道：模型为什么能"理解"文字、输入是怎么被处理的、输出的概率是怎么来的。这决定了你后面写代码时能否正确地切 token、控成本、调参数、处理长文本。
+
+### 0.1 技术演进：从 AI 到 LLM
+
+**一句话定义**：大语言模型（LLM，Large Language Model）是"深度学习"这条技术路线走到极致后的产物，专门用来处理和生成自然语言。
+
+**原理说明**：我们常听到的 AI、机器学习、深度学习、大模型，是四层逐级包含的关系，而不是并列的技术：
+
+- **人工智能（AI）**：最宽泛的概念。凡是让机器表现得像"智能"的程序都算，包括手写规则（if-else 专家系统）、搜索算法、也包括下层的机器学习。它的本质是"用人工编写的规则模拟智能"。
+- **机器学习（ML）**：AI 的一个子集。核心思想是"不从规则出发，而是从数据中自动学习规律"。你给模型一堆带标签的样本（如：邮件 + 是否垃圾邮件），它自己拟合出一个函数 f(邮件)→标签。
+- **深度学习（DL）**：ML 的一个子集。它用"深层神经网络"（成百上千层、神经元层层传递）来表达更复杂的函数。2012 年 AlexNet 在图像识别上碾压传统方法，开启了深度学习时代。
+- **大语言模型（LLM）**：深度学习在"自然语言"方向上的爆发。它的特别之处在于"规模"（Scale）：参数从亿级到万亿级，训练数据来自整个互联网，结构上采用了下面要讲的 Transformer。
+
+**生活类比**：AI 像"会做事的机器"这个总称；机器学习像"不用教规则、看例子就能学会的机器"；深度学习像"脑神经结构复杂、能学很微妙规律的机器"；大模型则是"读完了人类几乎所有书、专门擅长说话写文章的深度学习机器"。
+
+**本质区别记忆点**：AI 靠"人写规则"，ML 靠"数据学规则"，DL 靠"深层网络学复杂规则"，LLM 靠"超大规模 + Transformer 学语言规律"。作为应用开发者，你站在最顶层——直接吃现成模型的能力，不用管底层怎么训练。
+
+```mermaid
+graph TD
+    A["人工智能 AI<br/>用规则/算法模拟智能"] --> B["机器学习 ML<br/>从数据中自动学习规律"]
+    B --> C["深度学习 DL<br/>深层神经网络表达复杂函数"]
+    C --> D["大语言模型 LLM<br/>超大规模 + Transformer 专攻语言"]
+    D --> D1["GPT 系列 / Claude"]
+    D --> D2["DeepSeek / Qwen"]
+    D --> D3["Gemini / Llama"]
+```
+
+### 0.2 Transformer 架构核心原理
+
+**一句话定义**：Transformer 是一种"完全基于注意力机制、抛弃了循环结构"的神经网络架构，是现代所有大模型的骨架。
+
+#### 0.2.1 为什么需要它（历史痛点）
+
+在 Transformer 之前（2017 年以前），处理语言主流用 RNN / LSTM：句子一个词一个词地"串行"读进去。它的致命缺点是：
+1. **无法并行**：第 n 个词必须等第 n-1 个词算完；
+2. **长距离遗忘**：句子开头的信息传到结尾时早已衰减殆尽（比如"那个穿红衣服的、刚才在门口聊了半小时天的男孩……他走了"——"他"指代谁，RNN 早就忘了）。
+
+Transformer 一次性"看全整句话"，并用"注意力"直接计算任意两个词之间的关系，彻底解决了这两个问题。
+
+#### 0.2.2 自注意力机制（Self-Attention）在算什么
+
+**通俗解释**：自注意力就是让每个词在理解自己时，去"回头看"句子里所有其他词，并动态地给每个词分配一个"关注度权重"。比如句子"猫坐在垫子上，它很舒服"，模型算到"它"这个词时，注意力会高度集中在"猫"上，于是知道"它=猫"。
+
+**数学表达**：每个词先被映射成三个向量：
+
+- **Q（Query，查询）**："我在找什么信息"；
+- **K（Key，键）**："我能提供什么信息"；
+- **V（Value，值）**："我实际携带的内容"。
+
+注意力分数 = 用 Q 去匹配所有词的 K，分数高说明"相关性强"，再用这个分数对 V 做加权求和。核心公式（缩放点积注意力）：
+
+$$\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+
+- $QK^T$：Query 和每个 Key 做点积，得到相关性分数（越大越相关）；
+- $\sqrt{d_k}$：除以 Key 维度开根号，是为了防止维度太大时点积数值爆炸、softmax 梯度消失；
+- $\text{softmax}$：把分数变成加起来等于 1 的概率分布（即注意力权重）；
+- 最后乘以 $V$ 做加权求和，得到融合了全局上下文的新表示。
+
+#### 0.2.3 多头注意力（Multi-Head Attention）
+
+单个注意力只能关注一种"关系视角"（比如语法依赖）。多头注意力就是把 Q/K/V 投影成多组（比如 8 个头），每组各自算一遍注意力，捕捉不同角度的关系（一个头看语法、一个头看指代、一个头看语义……），最后拼接起来。这就像你同时用 8 个不同角度的"透镜"看同一句话。
+
+#### 0.2.4 位置编码（Positional Encoding）
+
+注意：自注意力天然是"无序"的——它同时看所有词，并不知道"猫坐在垫子上"和"垫子上坐在猫"的顺序区别。所以 Transformer 必须**额外注入位置信息**，这就是位置编码：给每个词叠加一个与其位置相关的向量，告诉模型"你在第几个位置"。现代大模型多用可学习的位置编码（如 RoPE 旋转位置编码），让模型能处理比训练时更长的文本。
+
+```mermaid
+graph LR
+    subgraph Input["输入层"]
+        T["Token 序列<br/>猫 / 坐 / 在 / 垫子 / 上"]
+    end
+    subgraph PE["+ 位置编码"]
+        P["叠加位置向量"]
+    end
+    subgraph ATT["多头自注意力"]
+        M["Q·K^T / √d → softmax → ×V<br/>8 个头并行计算"]
+    end
+    subgraph FF["前馈神经网络 FFN"]
+        F["逐位置非线性变换"]
+    end
+    subgraph OUT["输出"]
+        O["每个词的上下文表示"]
+    end
+    T --> P --> M --> F --> O
+    M -.->|"残差 + 层归一化"| F
+```
+
+### 0.3 Tokenization（分词）原理
+
+**一句话定义**：分词是把你输入的"字符串"切成模型能认识的最小单元（token）的过程，token 既不等于字，也不等于词。
+
+**原理说明**：模型并不认识"字"或"词"，它只认识一个固定大小的"词表"（比如 10 万～20 万个 token 编号）。所以任何文本进来，第一步都得切成词表里的单元。主流大模型用 **BPE（Byte Pair Encoding，字节对编码）** 算法，思路是"从字符开始，反复合并出现频率最高的相邻片段"。
+
+**BPE 一步步演示（以"机器学习"为例，纯演示逻辑）**：
+
+假设初始词表把每个字拆成字符：
+```
+初始: ['机','器','学','习']
+```
+1. 统计语料里相邻字符对的频率，发现"机器"出现最多 → 合并成 `机器`；
+2. 再统计，"学习"出现很多 → 合并成 `学习`；
+3. 反复迭代后词表里有了 `机器`、`学习`、`机器学习` 等子词。
+
+最终"机器学习"可能被切成：`['机器', '学习']` 两个 token（也可能是一个 `机器学习`，取决于训练时合并到哪一步、以及它在词表里是否独立存在）。关键是：**token 是"子词"粒度，不是整词也不是单字**。
+
+**中文 vs 英文的 token 差异（重要，直接影响成本）**：
+
+- 英文一个 token ≈ 0.75 个单词（常见词如 "hello" 是一个 token）；
+- 中文因为词表对汉字多按单字或双字存储，**一个汉字常常占 1 个 token**，一个中文词（如"机器学习"）通常 2～4 个 token。
+
+后果：同样含义的一句话，中文往往比英文消耗 **1.5～2 倍** 的 token 数，而 API 按 token 计费，所以中文应用成本天然偏高。你在估算费用、设计上下文长度时务必把这点算进去。
+
+**代码示例（用 tiktoken 看真实切分）**：
+```python
+import tiktoken
+
+enc = tiktoken.get_encoding("cl100k_base")  # GPT-4 系列词表
+text = "机器学习很有趣"
+tokens = enc.encode(text)
+print(tokens)                       # 例如 [53920, 58136, 78990, 352, ...]
+print([enc.decode([t]) for t in tokens])  # 看每个 token 对应什么片段
+print("token 数:", len(tokens))     # 中文通常每字 1 token
+```
+
+### 0.4 Embedding（嵌入）原理
+
+**一句话定义**：Embedding 是把"离散的文字"映射成"连续的高维向量"，让语义相近的文字在向量空间里距离也相近。
+
+**原理说明**：模型内部只认数字。文字必须先变成向量（比如一个 4096 维的浮点数数组）。通过训练，语义相似的词会被放到向量空间里靠近的位置——"猫"和"猫咪"的向量夹角很小，"猫"和"汽车"夹角很大。衡量"靠不靠近"最常用的指标是**余弦相似度**。
+
+**余弦相似度公式**：
+$$\cos(\theta) = \frac{A \cdot B}{|A|\,|B|} = \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum A_i^2}\,\sqrt{\sum B_i^2}}$$
+
+它只看**方向**不看长度，取值 [-1, 1]，越接近 1 越相似。
+
+**具体数值例子**（为演示用 3 维简化向量）：
+
+```
+"猫"     的向量 A = [0.9, 0.4, 0.1]
+"猫咪"   的向量 B = [0.85, 0.45, 0.15]   # 语义接近，方向几乎一致
+"汽车"   的向量 C = [0.1, -0.2, 0.9]     # 语义无关，方向不同
+```
+
+- A·B = 0.9×0.85 + 0.4×0.45 + 0.1×0.15 = 0.765 + 0.18 + 0.015 = 0.96
+- |A| ≈ √(0.81+0.16+0.01)=√0.98≈0.99，|B|≈√(0.7225+0.2025+0.0225)=√0.9475≈0.97
+- cos(A,B) ≈ 0.96 / (0.99×0.97) ≈ **0.999**（非常相似）
+
+- A·C = 0.9×0.1 + 0.4×(-0.2) + 0.1×0.9 = 0.09 - 0.08 + 0.09 = 0.10
+- |C| ≈ √(0.01+0.04+0.81)=√0.86≈0.93
+- cos(A,C) ≈ 0.10 / (0.99×0.93) ≈ **0.108**（几乎不相关）
+
+**应用意义**：RAG（检索增强生成）的核心就是——把用户问题 embed 成向量，去向量库里找余弦相似度最高的文档片段，再把这些片段喂给大模型。所以"Embedding + 余弦相似度"是你做 RAG 必须掌握的数学基础。
+
+### 0.5 采样参数：Temperature / Top-P / Top-K
+
+**一句话定义**：大模型每次并不是"确定地选出下一个词"，而是输出一个"所有候选词的概率分布"，采样参数决定我们怎么从这个分布里挑词。
+
+**原理说明**：模型算出下一个 token 时，给出的是每个候选 token 的概率（如"猫"40%、“狗”30%、“鸟”20%……）。默认情况下它**按概率随机抽**，所以同样的输入也可能得到不同输出——这就是为什么聊天会有"创意感"，但也带来"不稳定"。
+
+**Temperature（温度）**：调整分布的"平滑/陡峭"程度。
+- T 低（如 0.2）：把概率差距拉大，高概率词更可能被选中 → 输出**稳定、保守、确定性高**（适合代码、事实问答）；
+- T 高（如 1.0+）：分布变平缓，低概率词也常被翻牌 → 输出**发散、有创意、随机性强**（适合写诗、头脑风暴）。
+- 数学上：softmax 前先除以 T，即 $\text{softmax}(z_i/T)$。
+
+**Top-K**：只在概率最高的 K 个词里抽（如 K=50），过滤掉长尾噪声词。
+
+**Top-P（核采样，Nucleus Sampling）**：动态取"累计概率达到 P 的最小词集合"来抽（如 P=0.9 表示只从累计覆盖 90% 概率的那些词里选）。它比 Top-K 更灵活——分布尖时只留几个词，分布平时留很多词。**实践中推荐用 Top-P 代替 Top-K**。
+
+```mermaid
+graph TD
+    subgraph base["原始 logits 分布"]
+        L["猫 40% / 狗 30% / 鸟 20% / 鱼 10%"]
+    end
+    subgraph lowT["Temperature=0.2<br/>分布变陡峭"]
+        T1["猫 85% / 狗 12% / 鸟 2% / 鱼 1%"]
+    end
+    subgraph highT["Temperature=1.2<br/>分布变平缓"]
+        T2["猫 28% / 狗 26% / 鸟 24% / 鱼 22%"]
+    end
+    L --> lowT
+    L --> highT
+```
+
+**实践建议**：代码/SQL/结构化输出用 T=0；普通问答 T=0.2~0.5；创意写作 T=0.8~1.0；Top-P 设 0.9 通常够用。
+
+### 0.6 上下文窗口与 KV Cache
+
+**一句话定义**：上下文窗口是模型"一次能同时看到"的最大 token 数（含输入+输出）；KV Cache 是推理时为加速而缓存的历史键值对。
+
+**原理说明**：
+- **上下文窗口（Context Window）**：比如 128K tokens ≈ 一本 10 万字小说。超出窗口的内容模型"看不到"。注意它是**输入+输出共用**的额度，输出越长，留给输入的就越少。长文档处理、多轮对话累积历史，都会吃窗口。
+- **KV Cache（键值缓存）**：前面讲的自注意力要算 QK^T。如果每生成一个新词都把整段历史重算一遍，开销爆炸。于是把历史 token 算过的 K、V 缓存起来（KV Cache），新词只算自己的 Q 去和缓存的 K/V 匹配。代价是：上下文越长，缓存占显存越多——这就是为什么长对话会变慢、变贵。
+
+**对你开发的影响**：做多轮对话时别无脑把全历史塞回去；做长文档 RAG 时先切片检索，而不是整本塞进窗口。
+
+### 0.7 主流大模型对比（选型参考）
+
+> 价格以官方公布区间为准，会随时间变动，落地前请查最新官网。以下为示意量级。
+
+| 模型 | 厂商 | 上下文长度 | 中文能力 | 多模态 | 价格(输入/输出 $/百万token) | 兼容 OpenAI 格式 | 适合场景 |
+|------|------|-----------|---------|--------|---------------------------|----------------|---------|
+| DeepSeek-V3 | 深度求索 | 128K | 强 | 否(纯文本) | ~0.27 / ~1.10 | 是 | 高性价比中文、代码、Agent |
+| GPT-4o | OpenAI | 128K | 强 | 是(文/图/音) | ~2.5 / ~10 | 原生 | 多模态、海外合规场景 |
+| Claude 3.5 Sonnet | Anthropic | 200K | 较强 | 否 | ~3 / ~15 | 否(需适配) | 长文本、代码、严谨写作 |
+| Qwen2.5 | 阿里 | 128K | 很强 | 部分 | ~0.4 / ~1.2 | 是 | 中文、国产私有化部署 |
+| Gemini 1.5 Pro | Google | 1M~2M | 强 | 是 | ~1.25 / ~5 | 否(需适配) | 超长文档、多模态 |
+
+**API 提供方/平台选型对比**：
+
+| 维度 | 官方直连 | 云厂商市场(阿里云/腾讯云等) | 聚合网关(One-API等) |
+|------|---------|--------------------------|-------------------|
+| 优点 | 价格最低、最新鲜 | 国内访问稳、可开票 | 一套代码切多模型 |
+| 缺点 | 国内网络可能不稳 | 价格略高 | 多一跳延迟、需自建 |
+| 适用 | 海外/有网络方案 | 国内生产环境 | 多模型实验平台 |
+
+### 0.8 第 0 章自测题
+
+1. 用一句话说明 AI、机器学习、深度学习、大语言模型四者的包含关系，并指出大模型相比传统 ML 最关键的"规模"体现在哪两点。
+2. 自注意力公式 $\text{softmax}(QK^T/\sqrt{d_k})V$ 中，Q、K、V 分别代表什么？为什么要除以 $\sqrt{d_k}$？
+3. 为什么"机器学习"四个字在中文里可能消耗比英文 "machine learning" 更多的 token？这对你的应用成本意味着什么？
+4. 给定向量 A=[1,0,0]、B=[0.87,0.5,0]、C=[0,-1,0]，用余弦相似度判断 A 与谁更相似，并说明 RAG 如何利用这一原理。
+5. Temperature 从 0.2 调到 1.2，输出的概率分布和随机性会怎么变化？写代码时你会给"SQL 生成"和"诗歌创作"分别配什么 T 值？
+
+---
+
+## 第 1 章：环境准备
+
+> 本章目标：把你的 Java 开发环境武装到"能安全、稳定地调用大模型 API"。你已有的 Java + 前端基础完全够用，重点是补齐：JDK 版本选择、构建工具、API Key 安全管理、以及用最小成本验证连通性。
+
+### 1.1 开发工具链对比
+
+#### 1.1.1 JDK：17 vs 21
+
+| 维度 | JDK 17 | JDK 21 |
+|------|--------|--------|
+| 身份 | 上一个 LTS | 当前最新 LTS |
+| 虚拟线程 | 不支持 | 支持（Project Loom，高并发 I/O 利器） |
+| 新特性 | 密封类、switch 表达式 | 虚拟线程、分代 ZGC、字符串模板预览 |
+| 生态成熟度 | 几乎所有库都兼容 | 主流库已适配，更新较快 |
+| 建议 | 求稳选它 | **新项目推荐**：调 LLM 多为高并发网络 I/O，虚拟线程收益大 |
+
+**建议**：新项目直接用 JDK 21；若公司基线仍是 17 也无妨，调用 LLM 的 SDK 都兼容。
+
+#### 1.1.2 构建工具：Maven vs Gradle
+
+| 维度 | Maven | Gradle |
+|------|-------|--------|
+| 配置 | XML（pom.xml），约定优于配置 | Groovy/Kotlin DSL，灵活 |
+| 学习曲线 | 平缓，Java 开发者熟悉 | 略陡 |
+| 构建速度 | 较慢 | 增量构建快（有缓存） |
+| 建议 | 团队规范统一、求稳 | 追求构建效率、Kotlin 项目 |
+
+**建议**：手册示例统一用 Maven（最常见、资料最多）。
+
+#### 1.1.3 IntelliJ：社区版 vs 旗舰版
+
+| 维度 | 社区版(免费) | 旗舰版(付费) |
+|------|-------------|-------------|
+| Spring Boot 支持 | 需装插件/有限 | 原生完整 |
+| 数据库工具 | 无 | 有 |
+| HTTP 客户端 | 无 | 有（内置 .http 文件） |
+| 建议 | 学习够用 | 生产开发体验更好 |
+
+### 1.2 API Key 安全管理（四种方案）
+
+**核心原则**：API Key 绝对不能写进代码、不能提交到 Git。下面四种方案由浅入深。
+
+**方案一：.env 本地环境变量文件（推荐起步）**
+
+项目根目录放 `.env`（需加入 .gitignore），用 `dotenv` 读取。
+
+```bash
+# .env （切勿提交）
+DEEPSEEK_API_KEY=sk-xxxxxxxxxxxxxxxx
+OPENAI_API_KEY=sk-yyyyyyyyyyyyyyyy
+LLM_BASE_URL=https://api.deepseek.com
+```
+
+```java
+// 用 dotenv-java 读取
+import io.github.cdimascio.dotenv.Dotenv;
+Dotenv dotenv = Dotenv.load();
+String key = dotenv.get("DEEPSEEK_API_KEY");
+```
+
+**方案二：系统/容器环境变量（推荐生产）**
+
+不落地文件，直接在运行环境注入：
+
+```bash
+# Linux/Mac 终端或 CI 中
+export DEEPSEEK_API_KEY=sk-xxxxxxxx
+java -jar app.jar
+```
+
+```java
+// 直接读系统环境变量
+String key = System.getenv("DEEPSEEK_API_KEY");
+```
+
+```yaml
+# Spring Boot application.yml 中不写明文，引用环境变量
+llm:
+  api-key: ${DEEPSEEK_API_KEY}        # 来自环境变量，yml 里无明文
+  base-url: ${LLM_BASE_URL:https://api.deepseek.com}
+```
+
+**方案三：配置中心（Nacos / Apollo，推荐团队生产）**
+
+Key 存于配置中心，应用启动时拉取，支持动态轮换、权限管控，避免 Key 散落各处。
+
+**方案四：KMS / 密钥管理服务（云上最高安全级）**
+
+Key 加密存于云 KMS（阿里云 KMS、AWS KMS、腾讯云 SSM），应用运行时用角色凭证解密。适合金融、合规场景，配合最小权限 IAM。
+
+| 方案 | 安全级 | 复杂度 | 适用 |
+|------|--------|--------|------|
+| .env | 低 | 极低 | 本地学习 |
+| 环境变量 | 中 | 低 | 单机/容器部署 |
+| 配置中心 | 高 | 中 | 团队/微服务 |
+| KMS | 最高 | 高 | 合规/生产核心 |
+
+**必须配套的 .gitignore 片段**：
+```gitignore
+# 密钥与本地配置
+.env
+*.env.local
+application-secret.yml
+```
+
+### 1.3 用 curl 和 Postman 测试连通性
+
+在写 Java 代码前，先用最小工具验证 Key 和端点可用。
+
+**curl 方式**：
+```bash
+curl https://api.deepseek.com/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $DEEPSEEK_API_KEY" \
+  -d '{
+    "model": "deepseek-chat",
+    "messages": [{"role":"user","content":"你好，用一句话介绍自己"}],
+    "temperature": 0.5
+  }'
+```
+
+**Postman 方式**：
+- Method：`POST`
+- URL：`https://api.deepseek.com/chat/completions`
+- Headers：`Authorization: Bearer <你的Key>`、`Content-Type: application/json`
+- Body（raw / JSON）：
+```json
+{
+  "model": "deepseek-chat",
+  "messages": [{ "role": "user", "content": "你好" }],
+  "temperature": 0.5
+}
+```
+- 点 Send，看到 `choices[0].message.content` 返回即连通成功。
+
+### 1.4 DeepSeek 与 OpenAI 请求体差异对照
+
+**好消息**：DeepSeek 刻意兼容 OpenAI 的 API 格式，所以你能用 OpenAI 的 Java SDK（如 `openai-java`）直接连 DeepSeek，只需改 **base_url** 和 **model 名**。
+
+| 维度 | OpenAI | DeepSeek（兼容模式） |
+|------|--------|---------------------|
+| 端点 | `https://api.openai.com/v1/chat/completions` | `https://api.deepseek.com/chat/completions` |
+| 鉴权 Header | `Authorization: Bearer sk-...` | 同左（完全一样） |
+| model 字段 | `gpt-4o` 等 | `deepseek-chat` / `deepseek-reasoner` |
+| messages 结构 | `[{role, content}]` | 完全一致 |
+| 其余参数 | temperature/top_p/stream 等 | 完全一致 |
+
+**关键映射点**：
+1. 唯一差异在 `base_url` 和 `model` 名，请求体字段 100% 复用；
+2. DeepSeek 额外提供 `deepseek-reasoner`（推理模型），对应 OpenAI 的 `o1` 系列思路；
+3. 流式输出 `stream: true` 两边字段一致，都是 SSE 分片返回 `choices[0].delta.content`。
+
+**Java 调用示例（用 openai-java，仅改 baseUrl）**：
+```java
+import com.openai.client.OpenAIClient;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.models.chat.ChatCompletion;
+import com.openai.models.chat.ChatCompletionCreateParams;
+
+OpenAIClient client = OpenAIOkHttpClient.builder()
+    .apiKey(System.getenv("DEEPSEEK_API_KEY"))
+    .baseUrl("https://api.deepseek.com/v1")   // 唯一改动点
+    .build();
+
+ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
+    .model("deepseek-chat")                    // 模型名
+    .addUserMessage("用 Java 写一个快速排序")
+    .temperature(0.3)
+    .build();
+
+ChatCompletion completion = client.chat().completions().create(params);
+System.out.println(completion.choices().get(0).message().content().get());
+```
+
+### 1.5 第 1 章自测题
+
+1. 新项目你倾向选 JDK 17 还是 21？给出至少一条"虚拟线程对调 LLM 接口有益"的理由。
+2. 为什么 API Key 绝不能写进代码或提交 Git？请列出四种安全管理方案并说明各自的适用场景。
+3. 写一段 `application.yml` 片段，要求 API Key 不出现明文，而是从环境变量读取。
+4. DeepSeek 与 OpenAI 的 chat 接口有哪些差异？用 openai-java 连 DeepSeek 时，你实际只需要改哪两个值？
+5. 用 curl 测试 DeepSeek 连通性时，鉴权 Header 应该怎么写？如果返回 401，最可能的原因是什么？
+## 第 2 章：第一个 AI 应用 —— 跑通你的第一个聊天机器人
+
+本章目标：即使你完全没有 AI/ML 背景，也能在已有 Java + 前端知识的基础上，搭出一个能和用户实时对话的聊天机器人。我们会从架构讲起，逐个击破"怎么调 API、怎么维护多轮对话、怎么处理报错、怎么让前端流式显示"。
+
+### 2.1 整体架构：从浏览器到大模型
+
+一个最小可用的 AI 聊天应用，本质是"套了一层壳的 HTTP 调用"。浏览器不能直接、也不该直接持有大模型 API Key（会泄露密钥），所以必须有一层后端。典型分层如下：
+
+```mermaid
+flowchart TB
+    subgraph Browser["浏览器（前端）"]
+        UI[聊天 UI / 消息气泡 / 输入框]
+    end
+    subgraph Backend["Spring Boot 后端"]
+        CTRL[Controller：接收前端请求]
+        SVC[Service：拼装 Prompt / 维护会话历史]
+        CLIENT[LLM Client：调用大模型 API]
+        CFG[(application.yml：API Key / 模型 / 超时)]
+    end
+    subgraph LLM["大模型服务（OpenAI / 通义 / 智谱 等）"]
+        API[Chat Completions API]
+        MODEL[(大模型权重)]
+    end
+
+    UI -->|"HTTP POST /chat {message}"| CTRL
+    CTRL --> SVC
+    SVC --> CLIENT
+    CLIENT -->|"HTTPS POST /v1/chat/completions"| API
+    API --> MODEL
+    MODEL -->|"JSON / SSE 流式"| API
+    API -->|"响应"| CLIENT
+    CLIENT -->|"结果"| SVC
+    SVC --> CTRL
+    CTRL -->|"JSON / 流式 text"| UI
+
+    style Browser fill:#e3f2fd
+    style Backend fill:#fff3e0
+    style LLM fill:#e8f5e9
+```
+
+**各层职责一句话说明：**
+
+| 层 | 职责 | 关键关注点 |
+|---|---|---|
+| 浏览器（前端） | 展示消息、采集用户输入、流式渲染 | 用户体验、不要暴露 Key |
+| Spring Boot 后端 | 鉴权、拼 Prompt、维护会话、调模型 | 安全、稳定性、成本控制 |
+| 大模型服务 | 根据请求生成文本 | 模型选择、计费、速率限制 |
+
+> **核心认知**：大模型 API 就是一个"接收一段结构化文本、返回一段文本"的远端服务。你的工作是把业务问题翻译成它能理解的格式。
+
+### 2.2 一次对话的完整流程（时序图）
+
+非流式（一次性返回）与流式（像打字机一样逐字返回）差异巨大。下面用 Mermaid 时序图展示两者：
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as 用户
+    participant FE as 前端
+    participant BE as Spring Boot 后端
+    participant LLM as 大模型 API
+
+    U->>FE: 输入"你好"并发送
+    FE->>BE: POST /chat {message:"你好"}
+    BE->>BE: 1. 从 session 取出历史
+    BE->>BE: 2. 组装 messages（system+history+user）
+    BE->>LLM: POST /v1/chat/completions
+    Note over LLM: 模型推理（可能耗时数秒）
+
+    alt 非流式（stream=false）
+        LLM-->>BE: 完整 JSON 响应（一次返回）
+        BE-->>FE: 完整回答 JSON
+        FE-->>U: 整段渲染回答
+    else 流式（stream=true，SSE）
+        LLM-->>BE: event: 第1个 token
+        BE-->>FE: text/plain 分块推送
+        LLM-->>BE: event: 第2个 token
+        BE-->>FE: 继续推送
+        LLM-->>BE: event: [DONE]
+        BE-->>FE: 流结束
+        FE-->>U: 逐字/逐段渲染（打字机效果）
+    end
+```
+
+**非流式 vs 流式对比：**
+
+| 维度 | 非流式 | 流式 |
+|---|---|---|
+| 首字延迟 | 高（等全部生成完） | 低（第一个 token 就显示） |
+| 用户体验 | 卡顿感 | 自然流畅 |
+| 实现复杂度 | 低 | 略高（需解析 SSE） |
+| 适用场景 | 后台批处理、测试 | 聊天、写作、代码生成 |
+
+### 2.3 四种调用大模型的方式
+
+我们以"调用 OpenAI 兼容接口"为例（国内模型如通义千问、智谱、DeepSeek 大多兼容这套协议，换 baseUrl 即可）。
+
+#### 方式一：用 Spring `RestTemplate` 裸调（最直白，理解原理）
+
+```java
+@RestController
+@RequestMapping("/api/chat")
+public class ChatController {
+
+    private final RestTemplate rest = new RestTemplate();
+    private static final String URL = "https://api.openai.com/v1/chat/completions";
+    @Value("${openai.api-key}") private String apiKey;
+
+    @PostMapping
+    public String chat(@RequestBody Map<String, String> body) {
+        // 1. 组装请求体
+        Map<String, Object> req = new HashMap<>();
+        req.put("model", "gpt-4o-mini");
+        req.put("temperature", 0.7);
+        req.put("messages", List.of(
+            Map.of("role", "system", "content", "你是乐于助人的助手。"),
+            Map.of("role", "user", "content", body.get("message"))
+        ));
+
+        // 2. 设置请求头（鉴权）
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(req, headers);
+
+        // 3. 发起调用并解析
+        ResponseEntity<Map> resp = rest.postForEntity(URL, entity, Map.class);
+        Map<?, ?> firstChoice = ((List<Map<?, ?>>) resp.getBody().get("choices")).get(0);
+        Map<?, ?> message = (Map<?, ?>) firstChoice.get("message");
+        return (String) message.get("content");
+    }
+}
+```
+
+#### 方式二：用 LangChain4j（声明式，最省心，推荐入门）
+
+```java
+// 1. 声明一个 AI 服务接口（像写 Spring 接口一样）
+public interface ChatAssistant {
+    @SystemMessage("你是乐于助人的中文助手。")
+    String chat(String userMessage);
+}
+
+// 2. 配置并注入
+@Configuration
+public class LlmConfig {
+    @Bean
+    public ChatAssistant assistant(@Value("${openai.api-key}") String key) {
+        OpenAiChatModel model = OpenAiChatModel.builder()
+                .apiKey(key)
+                .modelName("gpt-4o-mini")
+                .temperature(0.7)
+                .build();
+        return AiServices.create(ChatAssistant.class, model);
+    }
+}
+
+// 3. 在 Controller 中直接调用
+@RestController
+@RequestMapping("/api/chat")
+public class ChatController {
+    private final ChatAssistant assistant;
+    public ChatController(ChatAssistant assistant) { this.assistant = assistant; }
+
+    @PostMapping
+    public String chat(@RequestBody Map<String, String> body) {
+        return assistant.chat(body.get("message")); // 一行搞定
+    }
+}
+```
+
+#### 方式三：用 Spring AI（与 Spring 生态最融合）
+
+```java
+@RestController
+@RequestMapping("/api/chat")
+public class ChatController {
+
+    private final ChatClient chatClient;
+
+    public ChatController(ChatClient.Builder builder,
+                         @Value("${openai.api-key}") String key) {
+        this.chatClient = builder
+                .defaultSystem("你是乐于助人的中文助手。")
+                .build();
+        // 实际还需通过配置/环境变量设置 spring.ai.openai.api-key
+    }
+
+    @PostMapping
+    public String chat(@RequestBody Map<String, String> body) {
+        return chatClient.prompt()
+                .user(body.get("message"))
+                .call()
+                .content();
+    }
+
+    // 流式调用：返回 Flux，前端可逐段接收
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> stream(@RequestParam String message) {
+        return chatClient.prompt().user(message).stream().content();
+    }
+}
+```
+
+> 方式四：`WebClient`（非阻塞响应式）与 RestTemplate 思路一致，只是用链式 API；方式一已展示核心，故略。
+
+**四方式优缺点对比表：**
+
+| 方式 | 上手难度 | 可维护性 | 流式支持 | 适合人群 |
+|---|---|---|---|---|
+| RestTemplate 裸调 | 低（直观） | 差（要手写解析） | 需自己解析 SSE | 想理解原理者 |
+| OpenAI Java SDK | 低 | 中 | 原生支持 | 偏好官方 SDK |
+| LangChain4j | 中 | 高（声明式） | 原生支持 | 想快速做 RAG/Agent |
+| Spring AI | 中 | 高（Spring 风格） | 原生支持 | Spring 项目首选 |
+
+### 2.4 Chat Completions API 请求体字段完整解析
+
+| 字段 | 含义 | 常见取值 | 说明 |
+|---|---|---|---|
+| `model` | 模型名 | `gpt-4o-mini` / `deepseek-chat` | 不同模型能力/价格不同 |
+| `messages` | 对话消息数组 | 见下 | 每次请求都需带上完整上下文 |
+| `temperature` | 随机性 | 0.0–2.0，默认 1.0 | 越低越确定、越高越发散 |
+| `top_p` | 核采样 | 0.0–1.0 | 与 temperature 二选一控制多样性 |
+| `max_tokens` | 最大输出长度 | 如 1024 | 防超长、控成本 |
+| `stream` | 是否流式 | `true`/`false` | true 则 SSE 逐块返回 |
+| `response_format` | 输出格式 | `{"type":"json_object"}` | 强制 JSON（需 prompt 提示） |
+| `tools` | 工具定义 | 函数描述数组 | 实现 Function Calling |
+
+**完整请求示例（带注释）：**
+
+```json
+{
+  "model": "gpt-4o-mini",          // 指定模型
+  "temperature": 0.7,              // 适度发散，又不至于胡说
+  "max_tokens": 1024,              // 最多生成 1024 个 token
+  "stream": false,                 // 非流式，一次性返回
+  "response_format": { "type": "text" }, // 纯文本（也可 json_object）
+  "messages": [
+    { "role": "system",
+      "content": "你是专业的中文客服助手，语气友好、简洁。" },
+    { "role": "user",
+      "content": "我的订单还没发货，怎么办？" }
+  ]
+}
+```
+
+**完整响应示例（逐字段注释）：**
+
+```json
+{
+  "id": "chatcmpl-abc123",         // 本次请求唯一 ID
+  "object": "chat.completion",     // 对象类型
+  "created": 1718000000,           // 时间戳（秒）
+  "model": "gpt-4o-mini",          // 实际使用的模型
+  "choices": [                     // 候选结果（n>1 时多个）
+    {
+      "index": 0,                  // 第几个候选
+      "message": {                 // 模型返回的消息
+        "role": "assistant",       // 角色固定为 assistant
+        "content": "您好！请提供订单号，我帮您查询发货状态。" // 正文
+      },
+      "finish_reason": "stop"      // 结束原因：stop/length/tool_calls
+    }
+  ],
+  "usage": {                       // 用量统计（计费依据）
+    "prompt_tokens": 28,           // 输入 token 数
+    "completion_tokens": 15,       // 输出 token 数
+    "total_tokens": 43             // 合计
+  }
+}
+```
+
+### 2.5 角色消息机制与多轮对话
+
+三种角色各司其职：
+
+- **system**：设定 AI 的人设、语气、规则。通常每条请求都放最前面，且内容不变。
+- **user**：用户说的话（每轮用户输入）。
+- **assistant**：AI 之前的回答。把历史回答回传，模型才"记得"上文。
+
+**维护多轮会话历史的 Java 代码（基于内存 Map，生产应换 Redis/DB）：**
+
+```java
+@Service
+public class ConversationService {
+
+    // sessionId -> 消息历史
+    private final Map<String, List<Map<String, String>>> store = new ConcurrentHashMap<>();
+
+    public String chat(String sessionId, String userInput, ChatAssistant assistant) {
+        List<Map<String, String>> history =
+                store.computeIfAbsent(sessionId, k -> new ArrayList<>());
+
+        // 追加用户消息
+        history.add(Map.of("role", "user", "content", userInput));
+
+        // 用历史构造 prompt（system 单独加在最前）
+        StringBuilder sb = new StringBuilder("你是乐于助人的中文助手。\n\n历史对话：\n");
+        for (Map<String, String> m : history) {
+            sb.append(m.get("role")).append(": ").append(m.get("content")).append("\n");
+        }
+
+        String reply = assistant.chat(sb.toString());
+
+        // 把 AI 回复也记入历史，供下一轮使用
+        history.add(Map.of("role", "assistant", "content", reply));
+
+        // 控制历史长度，避免 token 爆炸（只保留最近 10 轮）
+        if (history.size() > 20) history.subList(0, history.size() - 20).clear();
+
+        return reply;
+    }
+}
+```
+
+> **踩坑提示**：`messages` 必须严格交替且以 user/assistant 为主；不要只发 system 或连续两条 user，部分模型会报错。
+
+### 2.6 错误处理：超时、限流(429)、鉴权失败(401)
+
+```java
+@Configuration
+public class RestConfig {
+    @Bean
+    public RestTemplate restTemplate() {
+        SimpleClientHttpRequestFactory f = new SimpleClientHttpRequestFactory();
+        f.setConnectTimeout(5000);   // 连接超时 5s
+        f.setReadTimeout(60000);     // 读取超时 60s（模型可能慢）
+        return new RestTemplate(f);
+    }
+}
+
+@Service
+public class SafeChatService {
+    private final RestTemplate rest;
+    private static final String URL = "https://api.openai.com/v1/chat/completions";
+
+    public SafeChatService(RestTemplate rest) { this.rest = rest; }
+
+    public String chat(Map<String, Object> req, String apiKey) {
+        HttpHeaders h = new HttpHeaders();
+        h.setContentType(MediaType.APPLICATION_JSON);
+        h.setBearerAuth(apiKey);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(req, h);
+
+        try {
+            ResponseEntity<Map> resp = rest.postForEntity(URL, entity, Map.class);
+            // 2xx 正常解析
+            Map<?, ?> msg = (Map<?, ?>) ((List<Map<?, ?>>) resp.getBody().get("choices")).get(0).get("message");
+            return (String) msg.get("content");
+        } catch (HttpStatusCodeException e) {
+            int code = e.getStatusCode().value();
+            if (code == 401) {
+                throw new RuntimeException("API Key 无效或已过期，请检查配置。", e);
+            } else if (code == 429) {
+                // 限流：可在此加指数退避重试
+                throw new RuntimeException("请求过于频繁，被限流（429），请稍后重试。", e);
+            } else if (code >= 500) {
+                throw new RuntimeException("大模型服务端错误，请重试。", e);
+            } else {
+                throw new RuntimeException("调用失败：" + e.getResponseBodyAsString(), e);
+            }
+        } catch (RestClientException e) {
+            throw new RuntimeException("网络超时或连接失败，请检查网络。", e);
+        }
+    }
+}
+```
+
+**退避重试建议**：遇到 429，先等 `1s → 2s → 4s` 指数退避，最多 3 次；不要立即死循环重试。
+
+### 2.7 前端聊天页面（流式接收）
+
+```html
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>AI 聊天</title>
+  <style>
+    .bubble { padding:8px 12px; margin:6px 0; border-radius:10px; max-width:75%; }
+    .user { background:#d1e7ff; align-self:flex-end; }
+    .ai { background:#f1f1f1; }
+    #box { display:flex; flex-direction:column; height:70vh; overflow:auto; }
+    #loading { color:#999; font-style:italic; }
+  </style>
+</head>
+<body>
+  <div id="box"></div>
+  <input id="inp" placeholder="说点什么…" style="width:80%" />
+  <button onclick="send()">发送</button>
+
+<script>
+async function send() {
+  const inp = document.getElementById('inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+
+  const box = document.getElementById('box');
+  box.appendChild(bubble(text, 'user'));
+  const aiBubble = bubble('', 'ai');
+  box.appendChild(aiBubble);
+  const loading = document.createElement('div');
+  loading.id = 'loading'; loading.textContent = '正在思考…';
+  box.appendChild(loading);
+
+  // 流式请求：fetch + ReadableStream
+  const resp = await fetch('/api/chat/stream?message=' + encodeURIComponent(text));
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder();
+  loading.remove();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value, { stream: true });
+    // Spring AI SSE 形如 "data:xxx\n\n"，按需解析
+    aiBubble.textContent += chunk.replace(/^data:\s?/gm, '');
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
+function bubble(text, who) {
+  const d = document.createElement('div');
+  d.className = 'bubble ' + who;
+  d.textContent = text;
+  return d;
+}
+</script>
+</body>
+</html>
+```
+
+### 2.8 第 2 章自测题
+
+1. 为什么浏览器不能直接持有大模型 API Key？后端存在的三个核心职责是什么？
+2. `temperature=0` 与 `temperature=1.2` 分别会让回答呈现什么特点？什么场景该用低值？
+3. 多轮对话中，assistant 角色的消息为什么要回传给模型？如果不传会怎样？
+4. 遇到 HTTP 429，正确的处理策略是什么？为什么不能立刻无限重试？
+5. 流式与非流式响应在前后端代码上的主要差异是什么？
+
+---
+
+## 第 3 章：Prompt 工程入门
+
+如果说第 2 章解决"怎么把请求发出去"，第 3 章解决"怎么让回答符合预期"。**Prompt（提示词）是你与大模型之间唯一的沟通语言**，写得好，弱模型也能干好活；写得差，强模型也答非所问。
+
+### 3.1 为什么需要 Prompt 工程
+
+大模型是"概率生成"的：它根据上下文预测下一个最可能出现的词。你的 Prompt 就是"上下文"。同样的模型，Prompt 不同，输出质量天差地别。Prompt 工程就是**用结构化、有约束的方式表达意图**，把随机性引导到你要的方向。
+
+### 3.2 Prompt 四要素
+
+一个高质量 Prompt 通常包含四要素，缺一不可：
+
+```mermaid
+flowchart LR
+    A[角色 Role] --> E[完整 Prompt]
+    B[任务 Task] --> E
+    C[格式 Format] --> E
+    D[约束 Constraint] --> E
+
+    A -.->|"你是谁 / 以什么身份回答"| E
+    B -.->|"要做什么 / 目标是什么"| E
+    C -.->|"输出长什么样 / JSON 还是列表"| E
+    D -.->|"不要做什么 / 长度 / 语气"| E
+
+    style A fill:#ffe0b2
+    style B fill:#c8e6c9
+    style C fill:#b3e5fc
+    style D fill:#f8bbd0
+```
+
+#### 要素一：角色（Role）—— 告诉模型"你是谁"
+
+**Before（模糊）：** "翻译这段话。"
+
+**After（清晰）：** "你是一名资深中英翻译专家，译文要符合 IEEE 论文的书面语风格。" → 指定身份后，模型会自动套用该角色的知识与语气。
+
+#### 要素二：任务（Task）—— 明确"要做什么"
+
+**Before：** "处理一下这些数据。"
+
+**After：** "请把下面用户评论按情感分为『正面/负面/中性』三类，并各给出一句理由。"
+
+#### 要素三：格式（Format）—— 规定"输出长什么样"
+
+**Before：** "列出北京的三个景点。"
+
+**After：** "用 JSON 数组返回，每项含字段 name（名称）与 reason（推荐理由）。例：`[{\"name\":\"故宫\",\"reason\":\"明清皇宫\"}]`"
+
+#### 要素四：约束（Constraint）—— 划清"边界与禁忌"
+
+**Before：** "写个产品介绍。"
+
+**After：** "写 80 字以内的产品介绍，面向程序员，不使用营销夸张用语，不出现『最』『第一』等绝对化表述。"
+
+> **组合拳示例**：`你是电商客服主管（角色）｜给用户的差评写一句真诚致歉（任务）｜只返回致歉语，不超过 30 字（格式+约束）`。
+
+### 3.3 核心技术对比表
+
+| 技术 | 思路 | 适用场景 | 效果 | 成本（token/复杂度） |
+|---|---|---|---|---|
+| Zero-Shot | 不给例子，直接下令 | 简单、通用任务 | 中 | 低 |
+| One-Shot | 给 1 个示例 | 格式敏感任务 | 中高 | 低 |
+| Few-Shot | 给 3–5 个示例 | 分类、抽取、风格模仿 | 高 | 中 |
+| Chain-of-Thought (CoT) | 要求"一步步思考" | 推理、数学、逻辑 | 很高 | 中高 |
+| Tree-of-Thought (ToT) | 多分支探索再择优 | 复杂规划、搜索问题 | 极高 | 高 |
+
+**经验法则**：简单任务用 Zero-Shot，格式/风格难搞加 Few-Shot，涉及推理必加 CoT，复杂决策再上 ToT。
+
+### 3.4 Chain-of-Thought（思维链）详解
+
+**零样本 CoT**：只加一句"让我们一步步思考"（Let's think step by step），模型会先输出推理过程再给答案。
+
+**数学推理示例（不加 CoT）：**
+> 问：操场有 23 个男生、17 个女生，每 5 人一组，能分几组剩几人？
+> 答：8 组。（✗ 模型跳步直接给错数）
+
+**加零样本 CoT：**
+> 问：……请一步步思考。
+> 答：总人数 = 23 + 17 = 40。40 ÷ 5 = 8 组，余数 0。答：8 组，剩 0 人。（✓）
+
+**少样本 CoT（给带推理过程的例子）：**
+```
+示例：
+问：小明有 12 颗糖，给弟弟一半，又买 5 颗，剩几颗？
+答：12 的一半是 6，给弟弟后剩 6；再买 5 颗得 11。答案：11。
+---
+问：图书馆借出 30 本，还剩 45 本，原来有几本？请一步步思考。
+答：借出 30 且剩 45，原来 = 30 + 45 = 75。答案：75。
+```
+
+### 3.5 结构化输出：JSON Mode 与 Function Calling
+
+很多时候我们要把模型输出喂给程序（如抽取字段、调用工具）。两种方式：
+
+#### 方式 A：JSON Mode（强制 JSON 文本）
+
+```java
+// 用 RestTemplate 调，response_format=json_object
+Map<String, Object> req = new HashMap<>();
+req.put("model", "gpt-4o-mini");
+req.put("response_format", Map.of("type", "json_object"));
+req.put("messages", List.of(Map.of(
+    "role", "user",
+    "content", "从这句话抽取姓名、城市、年龄，返回 JSON：" +
+               "{\"name\":\"张三\",\"city\":\"北京\",\"age\":28}。文本：李四是上海人，32 岁。")));
+// ...发起请求后解析：
+String json = (String) ((Map<?,?>) ((List<Map<?,?>>) resp.getBody().get("choices"))
+        .get(0).get("message")).get("content");
+Map<?, ?> data = new ObjectMapper().readValue(json, Map.class);
+System.out.println(data.get("name")); // 李四
+```
+
+#### 方式 B：用 LangChain4j 的 AiServices 声明式（更优雅）
+
+```java
+// 1. 定义结构化返回类型
+public record UserInfo(String name, String city, int age) {}
+
+// 2. 声明接口，让框架自动做 JSON 解析与映射
+public interface Extractor {
+    @UserMessage("从文本中抽取用户信息：{{text}}")
+    @OutputType(UserInfo.class)   // 触发结构化输出
+    UserInfo extract(@V("text") String text);
+}
+
+// 3. 调用
+Extractor ex = AiServices.create(Extractor.class, model);
+UserInfo u = ex.extract("李四是上海人，32 岁。");
+System.out.println(u.name()); // 李四
+```
+
+> **对比**：JSON Mode 手动解析灵活但易出错；AiServices 声明式把"生成+解析"封装掉，代码更干净，推荐在生产中使用。
+
+### 3.6 Prompt 模板管理
+
+| 方式 | 做法 | 优点 | 缺点 |
+|---|---|---|---|
+| 硬编码 | 字符串写死在代码里 | 简单 | 改文案要重新编译 |
+| 配置化 | 放 `application.yml` / 数据库 | 不改代码可热更 | 无变量替换能力 |
+| 模板引擎 | 用 `String.format` / Velocity / 专用 Prompt 模板 | 支持变量、复用 | 稍复杂 |
+
+**Spring 配置化模板示例：**
+
+```yaml
+# application.yml
+prompt:
+  translator: "你是一名{{tone}}风格的翻译专家，请把下面内容译为{{target}}：\n{{text}}"
+```
+
+```java
+@Component
+@ConfigurationProperties(prefix = "prompt")
+public class PromptProperties {
+    private Map<String, String> templates = new HashMap<>();
+    public Map<String, String> getTemplates() { return templates; }
+}
+
+@Service
+public class TranslateService {
+    private final PromptProperties props;
+    public TranslateService(PromptProperties props) { this.props = props; }
+
+    public String build(String tone, String target, String text) {
+        String tpl = props.getTemplates().get("translator");
+        return tpl.replace("{{tone}}", tone)
+                 .replace("{{target}}", target)
+                 .replace("{{text}}", text);
+    }
+}
+```
+
+### 3.7 常见反模式与调试技巧
+
+**反模式 1：模糊指令**
+- ✗ "写点东西关于 Java。"
+- ✓ "写一段 100 字、面向初学者的 Java 多线程简介，含一个 Runnable 示例。"
+
+**反模式 2：缺乏约束**
+- ✗ "总结这篇文章。"（可能返回 2000 字）
+- ✓ "用 3 条要点总结，每条不超过 30 字。"
+
+**反模式 3：上下文泄漏**
+- 把上一个用户的隐私数据带进下一个会话；或 system 提示里写死不该暴露的内部规则。
+- 修正：会话隔离 + 历史裁剪（见 2.5）+ 敏感字段脱敏。
+
+**调试技巧：**
+1. **分而治之**：把复杂 Prompt 拆成"角色/任务/格式"逐段验证。
+2. **打印完整请求**：把发出去的 messages 全部 log 出来，核对是否如你所想。
+3. **小样本探测**：用 5 条典型输入跑一遍，看失败模式，再补 Few-Shot 示例。
+4. **温度调低**：调试阶段设 `temperature=0`，排除随机性干扰，确认是 Prompt 问题还是模型问题。
+5. **断言输出**：对结构化输出写单元测试，断言字段存在且类型正确。
+
+### 3.8 第 3 章自测题
+
+1. Prompt 四要素分别解决什么类型的歧义？缺了"格式"要素通常会出什么问题？
+2. 什么场景下该用 Few-Shot 而不是 Zero-Shot？请举一个自己的例子。
+3. 零样本 CoT 的关键触发句是什么？它为什么能提升数学推理准确率？
+4. JSON Mode 与 Function Calling（AiServices）在"获取结构化数据"上各有什么取舍？
+5. 为什么调试 Prompt 时建议先把 temperature 设为 0？上下文泄漏有哪些典型危害？
+
+---
+
+> **下一步（第 4 章预告）**：当单个 Prompt 不够用时，我们需要 RAG（检索增强）让模型"查资料再答"，以及 Agent（智能体）让模型"自己调工具"。届时将用到本章所有 Prompt 技巧与第 2 章的调用能力。
+## 第 4 章：RAG 知识库问答 —— 让 AI 读懂你的文档
+
+> 适用读者：有 Java + 前端基础、但完全没有 AI/ML 背景的开发者。学完本章，你将能够把"公司内部的 PDF/Word/网页"变成 AI 能回答的"知识库"，并理解每个环节为什么这么做、出了错怎么调。
+
+---
+
+### 4.1 为什么需要 RAG：从"瞎猜"到"有据可依"
+
+**RAG（Retrieval-Augmented Generation，检索增强生成）** 的核心思想只有一句话：**先去资料库里查，再把查到的内容喂给大模型，让它基于证据回答。**
+
+#### 4.1.1 大模型的三大硬伤
+
+| 硬伤 | 说明 | 例子 |
+| --- | --- | --- |
+| 知识截止 | 训练数据有截止日期，之后的事一概不知 | 问"昨天发布的 XXX 政策"，模型答不出 |
+| 幻觉 | 不知道时会"一本正经地编" | 编造不存在的法条、接口、人名 |
+| 私有数据盲区 | 没见过你的公司内部文档 | 问"我们报销流程是什么"，模型胡说 |
+
+#### 4.1.2 对比：无 RAG vs 有 RAG
+
+假设你的知识库里有一句话："公司年假规则：入职满 1 年享 5 天，满 3 年享 10 天。"
+
+- **无 RAG（直接问大模型）**
+  > 问：我们公司年假怎么算？
+  > 答：一般企业年假为入职满 1 年 5 天、满 10 年 10 天、满 20 年 15 天（按国家劳动法）。
+  > ❌ 把"国家通用规则"当成了"你们公司规则"，且完全没用到内部制度。
+
+- **有 RAG（先检索再生成）**
+  > 问：我们公司年假怎么算？
+  > 检索到片段：「入职满 1 年享 5 天，满 3 年享 10 天」
+  > 答：根据公司制度，入职满 1 年可享 5 天年假，满 3 年可享 10 天年假。
+  > ✅ 答案来自你的文档，可追溯、可验证。
+
+一句话总结：**大模型负责"说人话"，RAG 负责"说真话"。**
+
+---
+
+### 4.2 RAG 全流程架构深解
+
+RAG 分两个阶段：**离线入库（把文档变成可检索的向量）** 和 **在线查询（拿到问题去检索再生成）**。
+
+#### 4.2.1 离线入库流程图
+
+```mermaid
+flowchart TD
+    A[原始文档<br>PDF/Word/HTML/Markdown] --> B[文档加载 Loader]
+    B --> C[解析与清洗<br>去页眉页脚/提取正文]
+    C --> D[切片 Chunking<br>切成小段文本]
+    D --> E[Embedding 向量化<br>文本 → 高维向量]
+    E --> F[向量数据库<br>Vector Store]
+    F --> G[(持久化存储<br>向量 + 原文 + 元数据)]
+```
+
+#### 4.2.2 在线查询流程图
+
+```mermaid
+flowchart TD
+    Q[用户问题] --> E[Embedding 向量化问题]
+    E --> R[向量检索<br>相似度 Top-K]
+    R --> RR[Rerank 重排]
+    RR --> P[拼接 Prompt<br>问题 + 检索片段]
+    P --> L[大模型生成回答]
+    L --> A[带引用的答案]
+```
+
+#### 4.2.3 各环节底层原理
+
+- **文档加载（Loader）**：用解析库把不同格式读成纯文本。PDF 用 `pdfplumber`/`PyMuPDF`，Word 用 `python-docx`，网页用 `BeautifulSoup` 去标签。
+- **解析与清洗**：去掉页眉、页码、表格线等噪声，否则噪声也会被向量化并污染检索。
+- **切片（Chunking）**：把长文档切成若干小段（chunk），因为大模型上下文有限，且检索要"定位到具体段落"才有用。
+- **Embedding**：用神经网络把文本编码成一组数字（向量）。语义相近的文本，向量在数学空间里也"离得近"。
+- **向量库**：专门存向量、并支持"按距离快速找最近邻"的数据库。
+- **检索**：把问题向量化，在库里找最相似的 K 个片段。
+- **重排（Rerank）**：初检可能不准，再用更强的模型二次排序，把最相关的顶上去。
+- **生成**：把检索片段 + 问题拼成 Prompt，让大模型基于片段作答，并尽量标注来源。
+
+---
+
+### 4.3 文档切片（Chunking）策略对比
+
+切片质量直接决定"能不能检索到对的片段"。切太大 → 噪声多、命中率低；切太小 → 上下文断裂、答不全。
+
+| 策略 | 原理 | 优点 | 缺点 | 适用场景 |
+| --- | --- | --- | --- | --- |
+| 固定大小切分 | 每 N 个字符/Token 一刀切断 | 简单、可控、速度快 | 可能切断句子/语义 | 通用文本、快速原型 |
+| 递归字符切分 | 优先按 `\n\n`→`\n`→` `→`字符` 递归拆 | 尽量在天然边界切，结构友好 | 仍可能跨语义 | **最常用默认值**（LangChain 默认） |
+| 按语义切分 | 用嵌入/小模型判断语义边界再切 | 片段语义完整 | 慢、依赖模型、成本高 | 长文、法律/论文 |
+| 按结构切分 | 按 Markdown 标题、HTML 标签、段落 | 保留层级、可带标题上下文 | 依赖文档结构规范 | 技术文档、API 手册、带目录的 PDF |
+
+#### 4.3.1 chunk_size 与 chunk_overlap 怎么调
+
+- **chunk_size（片段大小）**：单个片段的字符/Tokens 数。
+  - 太小（如 128）：上下文不足，回答缺前因后果。
+  - 太大（如 2048）：噪声多、单次检索命中不精准、占 token。
+  - **推荐起点**：中文 300–500 字 / 英文 500–1000 tokens。
+- **chunk_overlap（重叠）**：相邻片段重复的部分，防止一句话被切断后丢失语义。
+  - 推荐为 chunk_size 的 **10%–20%**。
+  - 重叠太大 → 重复内容多、检索冗余；太小 → 边界信息易丢。
+
+**调优建议**：先用"递归字符切分 + 512 字 + 64 字重叠"跑通，再用评估集（见 4.9）逐步增大/减小观察召回变化。
+
+---
+
+### 4.4 Embedding 模型原理与对比
+
+#### 4.4.1 一句话原理
+
+Embedding 模型本质是一个**训练好的神经网络编码器**：把一句话输入网络，输出一个固定长度的数字数组（向量），语义越接近的句子，向量在空间中的"夹角"越小。
+
+#### 4.4.2 主流 Embedding 模型对比
+
+| 模型 | 维度 | 中文能力 | 是否开源 | 价格/获取 | 备注 |
+| --- | --- | --- | --- | --- | --- |
+| OpenAI text-embedding-3-small | 1536 | 中 | 否 | 约 $0.02/百万 tokens | 易用、稳定，英文强 |
+| OpenAI text-embedding-3-large | 3072 | 中 | 否 | 约 $0.13/百万 tokens | 精度更高、更贵 |
+| BGE-large-zh（智源） | 1024 | 强 | 是 | 开源免费 | 中文 RAG 经典选择 |
+| M3E（moka-ai） | 768 | 强 | 是 | 开源免费 | 中文友好、轻量 |
+| GTE（阿里） | 1024/768 | 强 | 是 | 开源免费 | 中英双语表现好 |
+
+> 选型口诀：**纯中文私有部署 → BGE/GTE/M3E；想省事上云 → OpenAI 3-small。**
+
+#### 4.4.3 向量维度与向量库的关系
+
+- 维度越高，能表达的语义越细，但**存储与检索成本随维度线性上升**。
+- 同一应用内所有文本必须用**同一个模型、同一维度**向量化，否则无法比较距离。
+- 向量库通常用"索引"（见 4.5）来加速高维检索；维度越高，索引构建越慢、内存越大。
+
+---
+
+### 4.5 向量数据库对比
+
+向量库不是在"精确匹配字符串"，而是在"高维空间里找最近邻"。核心靠**近似最近邻（ANN）索引算法**。
+
+> 索引算法一句话：**HNSW** = 建多层图，像跳表一样快速跳到邻居；**IVF** = 先聚类分桶，只在最近的几个桶里找，牺牲一点精度换速度。
+
+| 数据库 | 底层/索引 | 部署难度 | 性能 | 扩展性 | 适合场景 |
+| --- | --- | --- | --- | --- | --- |
+| Chroma | HNSW（内置） | ★ 极低（pip 即装） | 中（单机） | 弱（偏单机/嵌入式） | 本地开发、原型、中小数据 |
+| Milvus | HNSW/IVF/DiskANN | ★★★ 高（需分布式） | 高 | 强（分布式） | 海量数据、生产级 |
+| pgvector | 集成进 PostgreSQL | ★★ 中（装扩展） | 中 | 中（借 PG 生态） | 已有 PG、要事务/SQL 混合 |
+| Qdrant | HNSW（Rust 写） | ★★ 中（Docker） | 高 | 中强 | 生产推荐、性能好 |
+| Redis | HNSW（Redis Stack） | ★★ 中 | 高（内存） | 中 | 已用 Redis、要超低延迟 |
+
+#### 4.5.1 向量检索流程图
+
+```mermaid
+flowchart LR
+    Q[问题向量] --> I[向量库索引<br>HNSW/IVF]
+    I --> C[候选集<br>近似最近邻 K 个]
+    C --> S[按相似度排序]
+    S --> R[返回 Top-K 片段 + 原文 + 元数据]
+```
+
+---
+
+### 4.6 检索与相似度算法对比
+
+向量之间"多近"由相似度/距离度量决定：
+
+| 度量 | 公式直觉 | 取值范围 | 特点 | 适用 |
+| --- | --- | --- | --- | --- |
+| 余弦相似度 | 看两向量**方向**夹角 | [-1, 1]，越大越像 | 不受向量长度影响 | **RAG 最常用** |
+| 点积 | 向量逐元素相乘再求和 | 任意 | 受向量模长影响 | 归一化后等价余弦、推理快 |
+| 欧氏距离 | 空间中直线距离 | [0, +∞)，越小越像 | 受绝对值尺度影响 | 特征已归一化的聚类 |
+
+**为什么 RAG 常用余弦相似度？** 因为句子有长有短，向量"长度"不代表语义强度。余弦只看"方向"，更关注语义是否一致，对文本最稳健。多数 Embedding 模型（如 OpenAI）输出已归一化，此时余弦相似度 = 点积，计算更快。
+
+---
+
+### 4.7 重排（Rerank）
+
+初检（向量检索）是"快但粗"的近似最近邻，可能把字面不相关但语义相关的漏掉，或把表面像实则无关的顶上来。**Rerank 用更强的交叉编码器对"问题+每个候选片段"逐对打分，重排出真正最相关的 Top-N。**
+
+> 交叉编码器（Cross-Encoder）一句话：把"问题"和"片段"**拼在一起**输入同一个模型，直接输出一个相关性分数，比"各自编码再比距离"更准，但速度慢，所以只用在初检后的少量候选上。
+
+```mermaid
+flowchart TD
+    Q[用户问题] --> R1[向量检索 Top-20 候选]
+    R1 --> R2[Cross-Encoder 逐对打分<br>问题×片段]
+    R2 --> R3[按分数重排]
+    R3 --> R4[取 Top-3~5 送入大模型]
+```
+
+常用重排模型：`bge-reranker-large`（中文强、开源）、Cohere Rerank（API）。
+
+---
+
+### 4.8 混合检索（Hybrid Search）
+
+向量检索擅长"语义"，但不擅长"精确关键词"（如产品型号、错误码、人名）。**BM25** 是经典关键词匹配算法，恰好互补。
+
+```mermaid
+flowchart TD
+    Q[用户问题] --> V[向量检索<br>语义匹配]
+    Q --> K[BM25 关键词检索<br>字面匹配]
+    V --> M[结果融合 RRF/加权]
+    K --> M
+    M --> R[Rerank 重排]
+    R --> G[生成]
+```
+
+- **向量检索**：找"意思相近"的，比如问"怎么重置密码"能命中"如何找回登录口令"。
+- **BM25**：找"词面相同"的，比如问"ERR_502 怎么办"必须精确命中含 `ERR_502` 的文档。
+- **融合**：常用 RRF（Reciprocal Rank Fusion）按排名倒数加权合并，再交重排。
+
+---
+
+### 4.9 完整代码：两种技术栈
+
+#### 4.9.1 Python 版（chromadb + openai）
+
+```python
+# pip install openai chromadb sentence-transformers
+import openai
+from chromadb import Client
+from chromadb.config import Settings
+from sentence_transformers import CrossEncoder  # 重排模型
+
+# ---------- 配置 ----------
+OPENAI_API_KEY = "sk-xxx"
+EMBED_MODEL = "text-embedding-3-small"   # 也可换 bge/m3e
+LLM_MODEL = "gpt-4o-mini"
+CHUNK_SIZE = 500        # 切片大小（字符）
+CHUNK_OVERLAP = 64      # 重叠
+TOP_K = 5               # 初检召回数
+RERANK_TOP = 3          # 重排后送入大模型数
+TEMPERATURE = 0.1       # 越低越严谨，减少胡编
+
+client = openai.OpenAI(api_key=OPENAI_API_KEY)
+
+# ---------- 1. 切片 ----------
+def chunk_text(text, size=CHUNK_SIZE, overlap=CHUNK_OVERLAP):
+    """递归式简单切片：按 size 切，相邻片段重叠 overlap。"""
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = start + size
+        chunks.append(text[start:end])
+        start += size - overlap   # 滑动窗口，制造重叠
+    return [c for c in chunks if c.strip()]
+
+# ---------- 2. 入库（离线） ----------
+def build_index(documents, collection_name="kb"):
+    chroma = Client(Settings(anonymized_telemetry=False))
+    col = chroma.create_collection(collection_name)
+
+    all_chunks, ids, metas = [], [], []
+    for doc_id, text in enumerate(documents):
+        for i, c in enumerate(chunk_text(text)):
+            all_chunks.append(c)
+            ids.append(f"{doc_id}_{i}")
+            metas.append({"doc": doc_id, "idx": i})
+
+    # Embedding：文本 -> 向量
+    embeddings = [
+        client.embeddings.create(input=c, model=EMBED_MODEL).data[0].embedding
+        for c in all_chunks
+    ]
+    col.add(ids=ids, documents=all_chunks, embeddings=embeddings, metadatas=metas)
+    return chroma, col
+
+# ---------- 3. 检索 + 重排（在线） ----------
+reranker = CrossEncoder("BAAI/bge-reranker-large")  # 中文重排
+
+def retrieve(col, question, top_k=TOP_K):
+    q_emb = client.embeddings.create(input=question, model=EMBED_MODEL).data[0].embedding
+    res = col.query(query_embeddings=[q_emb], n_results=top_k)
+    docs = res["documents"][0]
+    # 重排：对每个(问题, 片段)打分
+    pairs = [(question, d) for d in docs]
+    scores = reranker.predict(pairs)
+    ranked = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
+    return [d for d, _ in ranked[:RERANK_TOP]]
+
+# ---------- 4. 生成 ----------
+def ask(col, question):
+    contexts = retrieve(col, question)
+    prompt = f"""你是企业知识库助手，仅根据下面的【资料】回答，
+若资料中没有答案，请回答"资料中未提及"。不要编造。
+
+【资料】
+{chr(10).join(f'{i+1}. {c}' for i, c in enumerate(contexts))}
+
+【问题】{question}
+【回答】"""
+    resp = client.chat.completions.create(
+        model=LLM_MODEL,
+        temperature=TEMPERATURE,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return resp.choices[0].message.content, contexts
+
+# ---------- 5. 运行示例 ----------
+if __name__ == "__main__":
+    docs = ["公司年假规则：入职满1年享5天，满3年享10天。报销需主管审批。"]
+    _, col = build_index(docs)
+    answer, ctx = ask(col, "我们公司年假怎么算？")
+    print("答案：", answer)
+    print("引用：", ctx)
+```
+
+#### 4.9.2 Java 版（LangChain4j + pgvector）
+
+**依赖（Maven，`pom.xml` 片段）：**
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j</artifactId>
+    <version>0.35.0</version>
+  </dependency>
+  <dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j-open-ai</artifactId>
+    <version>0.35.0</version>
+  </dependency>
+  <dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j-pgvector</artifactId>
+    <version>0.35.0</version>
+  </dependency>
+</dependencies>
+```
+
+**配置（`application.yml`）：**
+
+```yaml
+langchain4j:
+  open-ai:
+    chat-model:
+      api-key: ${OPENAI_API_KEY}
+      model-name: gpt-4o-mini
+      temperature: 0.1
+    embedding-model:
+      api-key: ${OPENAI_API_KEY}
+      model-name: text-embedding-3-small
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ragdb
+    username: postgres
+    password: postgres
+```
+
+**RAG Service 代码：**
+
+```java
+@Service
+public class RagService {
+
+    // 切片参数
+    private static final int CHUNK_SIZE = 500;
+    private static final int CHUNK_OVERLAP = 64;
+    private static final int TOP_K = 5;
+
+    private final ChatLanguageModel chatModel;
+    private final EmbeddingModel embedModel;
+    private final ContentRetriever retriever;
+
+    public RagService(ChatLanguageModel chatModel,
+                      OpenAiEmbeddingModel embedModel,
+                      DataSource dataSource) {
+        this.chatModel = chatModel;
+        this.embedModel = embedModel;
+
+        // 1. 向量库（pgvector，需先建扩展：CREATE EXTENSION vector;）
+        EmbeddingStore store = PgVectorEmbeddingStore.builder()
+                .datasource(dataSource)
+                .table("knowledge")
+                .dimension(1536)   // 与 text-embedding-3-small 维度一致
+                .build();
+
+        // 2. 文档解析 + 切片
+        DocumentParser parser = new TextDocumentParser();
+        Document document = parser.parse(new File("docs/company.txt"));
+        DocumentSplitter splitter = DocumentSplitters.recursive(CHUNK_SIZE, CHUNK_OVERLAP);
+        List<TextSegment> segments = splitter.split(document);
+
+        // 3. 向量化并入库
+        EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
+                .embeddingModel(embedModel)
+                .embeddingStore(store)
+                .build();
+        ingestor.ingest(document);
+
+        // 4. 检索器（带重排可用 EmbeddingStoreContentRetriever + 后续 Rerank）
+        this.retriever = EmbeddingStoreContentRetriever.builder()
+                .embeddingStore(store)
+                .embeddingModel(embedModel)
+                .maxResults(TOP_K)
+                .minScore(0.5)     // 相似度阈值，过滤无关片段
+                .build();
+    }
+
+    // 5. 问答
+    public String ask(String question) {
+        RetrievalAugmentor augmentor = DefaultRetrievalAugmentor.builder()
+                .contentRetriever(retriever)
+                .build();
+        ChatMemory memory = MessageWindowChatMemory.withMaxMessages(10);
+        ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
+                .chatLanguageModel(chatModel)
+                .retrievalAugmentor(augmentor)
+                .chatMemory(memory)
+                .build();
+        return chain.execute(question);
+    }
+}
+```
+
+#### 4.9.3 参数调优对照表
+
+| 参数 | 推荐值 | 调大影响 | 调小影响 |
+| --- | --- | --- | --- |
+| chunk_size | 300–500 字 | 上下文多但噪声多、检索不精准 | 上下文缺失、答不全 |
+| chunk_overlap | size 的 10–20% | 重复多、冗余 | 边界信息易丢失 |
+| top_k | 3–8 | 召回全但 token 贵、易引入噪声 | 可能漏掉正确答案 |
+| temperature | 0.0–0.3 | 更发散、易幻觉 | 更严谨、刻板 |
+
+---
+
+### 4.10 RAG 评估与常见问题
+
+#### 4.10.1 回答不准的排查顺序
+
+1. **是不是没检索到？** 直接打印检索出的片段，看是否包含答案。→ 调大 `top_k`、减小 `chunk_size`、换更强 Embedding。
+2. **检索到了但答不对？** 片段里有答案却没用。→ 降低 `temperature`、优化 Prompt（强调"仅依据资料"）。
+3. **片段本身噪声多？** → 加强解析清洗、调 `chunk_overlap`、加重排。
+4. **语义相关但关键词没命中？** → 上混合检索（BM25）。
+5. **整体都差？** → 换 Embedding/重排模型，或补文档覆盖度。
+
+#### 4.10.2 幻觉缓解
+
+- Prompt 强约束："资料中没有就回答未提及，禁止编造"。
+- 要求模型**标注引用来源**，便于人工核对。
+- 设 `min_score` 阈值，低置信度直接拒答。
+- 关键场景加**重排 + 答案一致性校验**（如用第二个模型复核）。
+
+#### 4.10.3 成本优化
+
+- Embedding 一次入库、反复查询，优先选便宜的 `text-embedding-3-small` 或本地开源模型。
+- 重排只用在初检后的少量候选（Top-20→Top-3），不要全量。
+- 缓存高频问题的检索结果；对长文档做去重切片，减少向量条数。
+- 生产用 `gpt-4o-mini` 级别模型足以应对多数知识库问答。
+
+---
+
+### 4.11 本章小结
+
+RAG = **检索（找证据）+ 生成（说人话）**。关键链路：文档加载 → 切片 → Embedding → 向量库 → 检索 → 重排 → 拼 Prompt → 生成。工程上 80% 的效果来自**切片策略 + Embedding 选型 + 重排**，而不是换更大的大模型。先跑通最小可用闭环，再用 4.9.3 的对照表逐步调参。
+
+---
+
+### 4.12 自测题
+
+1. **概念**：请用自己的话解释"为什么有了强大的大模型还需要 RAG？"列举至少两个原因。
+2. **切片**：chunk_size 设得过大和过小分别会带来什么问题？chunk_overlap 的作用是什么？
+3. **相似度**：RAG 为何常用余弦相似度而不是欧氏距离？两者核心区别在哪？
+4. **重排**：向量检索已经能返回 Top-K 了，为什么还要再做一次 Rerank？交叉编码器相比"各自编码再比距离"强在哪里？
+5. **综合**：用户问"错误码 ERR_502 怎么解决"，但你的知识库里有相关文档却没被检索到。请按本章的排查顺序，给出可能的 3 个原因及对应解决办法。
+## 第 5 章：Function Calling 与 Agent —— 让 AI 动手干活
+
+> 在前面的章节里，我们学会了如何调用大模型"聊天"：你输入一段文字，模型返回一段文字。但如果你问它"北京今天天气怎么样"，它只会凭记忆"猜"一个答案——它根本没有联网，也不知道实时数据。
+>
+> 这一章我们解决一个核心问题：**如何让大模型突破"只能聊天"的限制，去调用真实的外部能力（查天气、查数据库、发邮件、跑代码），并自主完成多步任务？** 答案就是两件事：Function Calling（函数调用）和 Agent（智能体）。
+
+---
+
+### 5.1 Function Calling 原理深解
+
+#### 5.1.1 大模型为什么能"调用函数"
+
+首先要破除一个误解：**大模型并不会真的"运行"你的 Java 函数。** 它既不能访问你的文件系统，也不能直接触发你的代码。所谓"调用函数"，本质上是：
+
+1. 你预先告诉模型："我这里有几个工具可以用，它们长这样（名字、用途、参数）"。
+2. 模型根据用户的自然语言问题，**判断是否需要用某个工具**，如果需要，就**生成一段结构化的 JSON**，里面写明"要调用哪个函数 + 参数是什么"。
+3. **你的程序**拿到这段 JSON，真正去执行对应的函数，把结果再喂回模型。
+4. 模型结合工具返回的真实数据，生成最终的自然语言回答。
+
+换句话说，**模型负责"决定"和"理解"，程序负责"执行"和"兜底"。** 模型是一个"指挥官"，它输出的是指令（JSON），而不是动作本身。
+
+下面这张图说明了这个本质区别：
+
+```mermaid
+flowchart TB
+    U["用户: 北京今天天气如何?"] --> M["大模型 LLM"]
+    M -->|"传统聊天: 直接输出自然语言(可能瞎编)"| A["❌ 凭记忆猜测"]
+    M -->|"Function Calling: 输出结构化 JSON 指令"| J["{
+  'name': 'getWeather',
+  'arguments': {'city': '北京'}
+}"]
+    J --> P["你的 Java 程序解析 JSON"]
+    P --> F["真正执行 getWeather('北京')"]
+    F --> R["返回真实天气数据"]
+    R --> M2["模型结合真实数据生成回答"]
+    M2 --> Ans["✅ 北京今天晴, 25°C, 适合户外运动"]
+```
+
+关键点：**"function name + arguments"是 JSON，不是自然语言**，所以解析是确定、可靠的；模型只生成"意图"，执行权始终在你手里（可以控制权限、超时、错误处理）。
+
+#### 5.1.2 完整时序图
+
+下面是一轮完整的 Function Calling 时序。注意每一轮 `messages` 数组是如何变化的——这是最容易出 bug 的地方。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as 用户
+    participant App as 你的程序
+    participant LLM as 大模型 API
+
+    U->>App: "北京今天天气如何？"
+    App->>LLM: messages=[{role:user, content:"北京今天天气如何？"}]<br/>tools=[getWeather 定义]
+
+    Note over LLM: 模型判断需要工具
+    LLM-->>App: 返回 tool_calls:<br/>[{name:"getWeather", args:{city:"北京"}}]<br/>(不再直接回答)
+
+    Note over App: 解析 tool_calls，执行本地函数
+    App->>App: 调用 getWeather("北京") 拿到 "晴, 25°C"
+    App->>LLM: messages=[
+        {role:user, content:"北京今天天气如何？"},
+        {role:assistant, tool_calls:[...]},  ← 原样回传模型的指令
+        {role:tool, name:"getWeather", content:"晴, 25°C"}  ← 工具结果
+    ]
+
+    Note over LLM: 模型结合真实数据生成回答
+    LLM-->>App: 返回最终文本: "北京今天晴, 25°C, 适合户外运动"
+    App->>U: 展示最终回答
+```
+
+`messages` 结构变化的三个要点：
+- **第一轮**：只有 `user` 消息 + `tools` 定义。
+- **第二轮**：必须**原样保留**第一轮模型发出的 `assistant`(带 `tool_calls`) 消息，再追加一条 `role: tool` 的消息承载工具返回结果。少任何一条都会报错或让模型"失忆"。
+- `role: tool` 消息需要带 `name` 字段（对应被调用的函数名），便于模型对齐。
+
+---
+
+### 5.2 工具定义（JSON Schema）详解
+
+工具定义就是告诉模型"有什么工具、怎么用"。它本质是一段 **JSON Schema**。下面以 OpenAI / 兼容 API 的 `tools` 字段为例拆解每个字段。
+
+#### 5.2.1 字段说明
+
+```json
+{
+  "type": "function",
+  "function": {
+    "name": "getWeather",
+    "description": "查询指定城市当前的天气情况，包括温度、天气状况和风力。",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "city": {
+          "type": "string",
+          "description": "城市名称，例如：北京、上海、Tokyo"
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["celsius", "fahrenheit"],
+          "description": "温度单位，不填默认摄氏度"
+        }
+      },
+      "required": ["city"]
+    }
+  }
+}
+```
+
+| 字段 | 含义 | 怎么写才对 |
+|------|------|-----------|
+| `name` | 工具/函数名 | 用英文、动词开头、驼峰，如 `getWeather`、`sendEmail`。不要用空格或中文 |
+| `description` | 工具用途 | **极其重要**。模型靠它决定"是否该用这个工具"。要写清楚"能做什么、什么时候用"，不要写实现细节 |
+| `parameters.type` | 固定为 `object` | 参数容器 |
+| `properties` | 每个参数的定义 | 每个参数都要有 `type` 和 `description`；能用 `enum` 就别用自由文本 |
+| `type` | 参数类型 | `string/number/integer/boolean/array/object`，越精确模型越不容易传错 |
+| `required` | 必填参数列表 | 只放真正必须的；放太多会让模型卡住，放太少会拿到空值 |
+
+#### 5.2.2 写好 vs 写不好的对比
+
+**❌ 写不好（模型容易误用或传错参）：**
+
+```json
+{
+  "name": "weather",
+  "description": "获取天气",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "location": { "type": "string" },
+      "detail": { "type": "string" }
+    },
+    "required": []
+  }
+}
+```
+
+问题：`description` 太短（没说何时用）、`location` 没说明格式、`detail` 没约束（自由文本 → 模型随便填）、`required` 为空（模型可能漏传城市）。
+
+**✅ 写得好（模型几乎不会用错）：**
+
+```json
+{
+  "name": "getWeather",
+  "description": "当用户询问某城市当前或未来几天的天气、温度、是否适合出行/运动时使用。需要实时数据时必须调用，不要凭记忆回答。",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "city": {
+        "type": "string",
+        "description": "城市中文名或英文名，例如：北京、上海"
+      },
+      "days": {
+        "type": "integer",
+        "enum": [0, 1, 2, 3],
+        "description": "预测天数，0 表示今天，最多 3 天。不填默认 0"
+      }
+    },
+    "required": ["city"]
+  }
+}
+```
+
+好在哪：`description` 既说明了用途也说明了触发条件；参数用 `enum` 约束；`required` 只保留必要的 `city`。
+
+---
+
+### 5.3 完整 Java 实现（LangChain4j AiServices 完整版）
+
+下面用 **LangChain4j 的 AiServices** 给出一段接近可运行的完整代码。AiServices 帮我们自动把接口方法转成 `tools` 定义、自动解析 `tool_calls`、自动回填消息，省去大量样板代码。
+
+#### 5.3.1 引入依赖（Maven）
+
+```xml
+<dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j</artifactId>
+    <version>0.34.0</version>
+</dependency>
+<dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j-open-ai</artifactId>
+    <version>0.34.0</version>
+</dependency>
+```
+
+#### 5.3.2 定义工具（Tool）
+
+工具就是一个普通 Java 类/接口方法，用 `@Tool` 注解描述：
+
+```java
+import dev.langchain4j.agent.tool.Tool;
+import dev.langchain4j.agent.tool.P;
+
+public class WeatherTools {
+
+    @Tool("查询指定城市今天的天气，返回温度与天气状况，用于判断是否适合户外运动")
+    public String getWeather(
+            @P("城市名称，如 北京") String city,
+            @P("预测天数，0=今天，最多3") int days) {
+        // 真实场景里这里会调用天气 API（如和风天气、OpenWeather）
+        // 此处用模拟数据演示
+        return city + " 今天：晴，25°C，微风3级，空气质量良。";
+    }
+
+    @Tool("根据天气和运动类型，判断当前是否适合户外运动")
+    public String adviseSport(
+            @P("天气描述") String weather,
+            @P("运动类型，如 跑步/骑行") String sport) {
+        return "天气条件良好，" + sport + " 适合进行，注意补水。";
+    }
+}
+```
+
+#### 5.3.3 定义 AiServices 接口并发起调用
+
+```java
+import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+
+public class AgentDemo {
+
+    interface Assistant {
+        @SystemMessage("你是一个贴心的生活助手，需要时务必调用工具获取真实数据，不要凭记忆编造。")
+        String chat(String userMessage);
+    }
+
+    public static void main(String[] args) {
+        ChatLanguageModel model = OpenAiChatModel.builder()
+                .apiKey(System.getenv("OPENAI_API_KEY"))
+                .modelName("gpt-4o-mini")
+                .build();
+
+        Assistant assistant = AiServices.builder(Assistant.class)
+                .chatLanguageModel(model)
+                .tools(new WeatherTools())   // 注册工具，框架自动生成 tools 定义
+                .build();
+
+        // 一次调用，框架内部自动完成：请求→解析tool_calls→执行→回填→二次请求
+        String answer = assistant.chat("北京今天天气如何？适合去户外跑步吗？");
+        System.out.println(answer);
+    }
+}
+```
+
+`assistant.chat(...)` 背后发生的事情，正是 5.1.2 时序图里的内容，只是被 LangChain4j 封装了。**AiServices 的优势**：不用手写 JSON Schema、不用手动解析 `tool_calls`、不用手动回填 `tool` 消息。
+
+#### 5.3.4 另一种方案：RestTemplate 裸调关键片段
+
+如果你想完全掌控（或对接非标准 API），可以用 Spring 的 `RestTemplate` 裸调。关键片段如下（完整调用需自己拼装 messages 循环）：
+
+```java
+// 1) 发起带 tools 的请求
+Map<String, Object> body = Map.of(
+    "model", "gpt-4o-mini",
+    "messages", List.of(Map.of("role", "user",
+                  "content", "北京今天天气如何？")),
+    "tools", List.of(weatherToolDefinition), // 见 5.2 的 JSON
+    "tool_choice", "auto"
+);
+// RestTemplate 发送 POST 到 /v1/chat/completions
+
+// 2) 解析返回的 tool_calls
+// JSON 形如: choices[0].message.tool_calls = [{id, type:"function",
+//          function:{name:"getWeather", arguments:"{\"city\":\"北京\"}"}}]
+// arguments 是 JSON 字符串，需要再反序列化
+
+// 3) 执行函数后回填
+List<Object> messages = new ArrayList<>(firstMessages);
+messages.add(Map.of("role", "assistant", "tool_calls", toolCalls)); // 原样回传
+messages.add(Map.of("role", "tool",
+                     "tool_call_id", id,
+                     "name", "getWeather",
+                     "content", realResult));     // 工具真实结果
+// 4) 再次 POST 同一接口，这次不传 tools 也能出最终回答（推荐仍传）
+```
+
+> 裸调的核心工作量在于"拼 messages + 解析 tool_calls + 回填"，且要处理多轮、并行调用、错误。这正是框架的价值所在。
+
+---
+
+### 5.4 多工具选择、并行调用与出错处理
+
+#### 5.4.1 多工具选择
+
+模型会根据每个工具的 `description` 自动选择最匹配的一个。**最佳实践**：给每个工具写清"何时用"；如果工具多（>10 个），可考虑先让模型"选工具类别"再展开（路由模式），避免一次性塞太多工具导致选择变差。
+
+#### 5.4.2 并行调用
+
+模型可以在**一次回复里返回多个 `tool_calls`**（例如同时查北京和上海天气）。处理时要并发执行、各自回填：
+
+```java
+// 伪代码：并发执行多个 tool_call
+List<CompletableFuture<ToolResult>> futures = toolCalls.stream()
+    .map(tc -> CompletableFuture.supplyAsync(() -> execute(tc)))
+    .toList();
+// 每个结果都生成一条 role:tool 消息，全部追加后再二次请求
+```
+
+注意：并行调用时，每条 `tool` 消息必须带对应的 `tool_call_id`，否则模型无法把结果和指令配对。
+
+#### 5.4.3 工具出错处理
+
+工具执行可能抛异常（网络超时、参数非法）。一定要兜底，并把"错误信息"当作 observation 回传，让模型自我纠正：
+
+```java
+try {
+    return tool.execute(args);
+} catch (Exception e) {
+    // 把错误作为观察结果返回，让模型决定重试/换参数/放弃
+    return "工具执行失败：" + e.getMessage() + "，请尝试调整参数或改用其他工具。";
+}
+```
+
+同时建议加**超时**与**最大重试次数**，防止单个工具把整个请求拖死。
+
+---
+
+### 5.5 Agent 深入
+
+#### 5.5.1 什么是 Agent
+
+Function Calling 解决的是"调一次工具"。但真实任务往往是多步的：比如"帮我规划一次北京两日游，预算 2000 以内，并把行程发到我邮箱"。这需要查天气、查景点、算预算、调用发邮件——还要在过程中做判断。
+
+**Agent（智能体）= 大模型（大脑）+ 工具（手脚）+ 记忆（上下文）+ 规划/推理循环（思考方式）。** 它不是一个新模型，而是一种"让模型在循环里反复思考→行动→观察"的运行范式。
+
+```mermaid
+flowchart TB
+    subgraph Agent["Agent 智能体"]
+        Brain["大模型 (LLM) 大脑<br/>思考 + 决策"]
+        Mem["记忆 Memory<br/>短期/长期/摘要"]
+        Plan["规划 Planning<br/>拆解任务"]
+        Tools["工具 Tools<br/>天气/搜索/DB/代码"]
+    end
+    Brain <--> Mem
+    Brain -->|"决定下一步"| Plan
+    Plan -->|"调用"| Tools
+    Tools -->|"Observation 观察结果"| Brain
+    Brain -->|"最终答案 / 继续循环"| Out["输出"]
+```
+
+Agent 和 Function Calling 的关系：**Function Calling 是 Agent 的"手脚接口"，Agent 是 Function Calling 在多步循环上的组织方式。**
+
+#### 5.5.2 ReAct 模式原理
+
+ReAct = **Reason（推理）+ Act（行动）**。核心思想是把模型的输出显式拆成：
+- **Thought（思考）**：我目前知道什么、还缺什么、下一步该干什么。
+- **Action（行动）**：调用哪个工具、传什么参数。
+- **Observation（观察）**：工具返回的结果。
+
+循环往复，直到模型认为可以给出 **Final Answer**。
+
+下面用真实例子走一遍。用户问：**"北京今天天气如何，适合户外运动吗？"**
+
+```
+Step 1
+Thought: 用户想知道北京今天的天气，并判断是否适合户外运动。我需要先获取实时天气。
+Action: getWeather(city="北京", days=0)
+Observation: 北京 今天：晴，25°C，微风3级，空气质量良。
+
+Step 2
+Thought: 已知北京今天晴、25°C、微风、空气良。这些条件对户外运动很友好，无需再查其他数据，可以下结论。
+Action: 无需调用工具，直接回答。
+Final Answer: 北京今天晴，25°C，微风，空气质量良，非常适合户外运动（如跑步、骑行），记得补水防晒。
+```
+
+如果问题更复杂（比如"北京和上海哪个更适合周末出游"），循环会拉长：查北京 → 查上海 → 比较 → 给出结论，体现多步推理。
+
+```mermaid
+flowchart TD
+    Start["用户输入任务"] --> T1["Thought: 分析问题, 列出已知/未知"]
+    T1 --> A1["Action: 选择并调用工具"]
+    A1 --> O1["Observation: 工具返回结果"]
+    O1 --> Check{"信息足够?<br/>能直接回答?"}
+    Check -->|否| T1
+    Check -->|是| FA["Final Answer 最终回答"]
+```
+
+#### 5.5.3 Planning 与 Reflection
+
+ReAct 是"走一步看一步"。更强大的 Agent 还会做两件事：
+
+- **Planning（规划）**：动手前先列计划。例如先让模型输出"任务拆解清单"（1.查天气 2.查景点 3.算预算 4.发邮件），再逐步执行。好处是方向感强、不易走偏。
+- **Reflection（反思）**：每完成一步或整体完成后，让模型自评"结果对不对、有没有遗漏、要不要重做"。例如："预算超了 200，需要替换一个景点。" 这能显著提升最终质量。
+
+实践中常见组合：**Plan → ReAct 执行 → Reflect 修正 → 再执行**。
+
+#### 5.5.4 Memory（记忆）类型对比
+
+| 记忆类型 | 原理 | 存什么 | 适用场景 | 优点 | 缺点 |
+|---------|------|--------|---------|------|------|
+| 短期对话历史 | 把最近 N 轮 messages 原样回传 | 完整对话原文 | 单轮/多轮闲聊、上下文连续任务 | 实现简单、保真度高 | 受 token 上限限制，长对话成本高 |
+| 长期向量记忆 | 把历史/知识切片 → 向量化 → 存向量库，按相似度检索 | 语义片段的 embedding | 个人知识库、客服历史、RAG | 可检索海量历史、跨会话 | 需搭建向量库，检索可能有噪声 |
+| 摘要记忆 | 定期用模型把历史对话压缩成摘要 | 浓缩后的要点 | 超长任务、角色扮演、长期助手 | 省 token、保留主线 | 细节可能丢失，依赖摘要质量 |
+
+**经验法则**：先用短期记忆跑通；需要"记住用户偏好/跨会话"再加长期向量记忆；对话特别长时用摘要记忆兜底。
+
+#### 5.5.5 Tool vs Agent：什么时候用哪个
+
+| 维度 | 单个 Function Calling | 完整 Agent |
+|------|----------------------|-----------|
+| 任务步数 | 1~2 步、路径确定 | 多步、路径不确定 |
+| 是否需要规划 | 不需要 | 需要拆解与决策 |
+| 是否需循环 | 调用一次即可 | 反复思考-行动-观察 |
+| 例子 | "查北京天气""算两数之和" | "规划旅行并邮件发送""分析日志定位 Bug" |
+| 复杂度/成本 | 低 | 高（多轮调用、更慢更贵） |
+
+**结论**：能用单次工具调用解决的，绝不上 Agent；只有当任务需要"根据中间结果决定下一步"时才用 Agent。
+
+#### 5.5.6 多 Agent 协作
+
+复杂系统常把不同职责拆给多个 Agent，像团队一样配合：
+
+```mermaid
+flowchart LR
+    User["用户需求"] --> P["Planner 规划者<br/>拆解任务/定计划"]
+    P --> E["Executor 执行者<br/>调用工具干活"]
+    E -->|"产物"| R["Reviewer 审查者<br/>检查质量/纠错"]
+    R -->|"通过"| Out["交付结果"]
+    R -->|"不通过, 打回"| E
+```
+
+- **Planner**：理解目标，拆成子任务，决定顺序。
+- **Executor**：真正调用工具执行子任务。
+- **Reviewer**：检查结果是否正确、完整，不通过则打回重做。
+
+其他常见角色还有 Retriever（检索）、Coder（写代码）、Summarizer（总结）。多 Agent 适合"质量敏感、步骤繁杂"的任务，但成本和延迟也更高。
+
+---
+
+### 5.6 完整 Agent 循环代码（ReAct 风格，Java）
+
+下面用**原生思路**（不依赖高级封装）实现一个带最大步数、终止条件的 ReAct Agent。为聚焦逻辑，工具执行用本地方法模拟；真实项目可替换为网络调用。
+
+```java
+import java.util.*;
+
+public class ReActAgent {
+
+    // 极简的"工具表"：名字 -> 可执行函数
+    static class ToolBox {
+        String getWeather(String city) {
+            return city + " 今天：晴，25°C，微风，空气良。";
+        }
+        String adviseSport(String w) {
+            return "天气良好，适合户外运动，注意补水。";
+        }
+    }
+
+    // 这里我们"假装"模型返回结构化指令；真实场景改为调用 LLM API 并解析 JSON。
+    // 返回 null 表示模型认为可以结束。
+    static class ModelStep {
+        String thought;
+        String action;     // 工具名，null 表示结束
+        String arg;        // 参数
+        String finalAnswer;
+    }
+
+    // 模拟一次模型决策（真实实现：组装 prompt + 调 LLM + 解析）
+    static ModelStep callModel(String userTask, List<String> history) {
+        // 演示：第一步查天气，第二步给结论
+        if (!history.contains("OBS:weather")) {
+            ModelStep s = new ModelStep();
+            s.thought = "需要先获取北京实时天气";
+            s.action = "getWeather";
+            s.arg = "北京";
+            return s;
+        }
+        ModelStep s = new ModelStep();
+        s.finalAnswer = "北京今天晴，25°C，微风，非常适合户外运动。";
+        return s;
+    }
+
+    public static String run(String userTask, int maxSteps) {
+        ToolBox tools = new ToolBox();
+        List<String> history = new ArrayList<>();
+        history.add("USER: " + userTask);
+
+        for (int step = 1; step <= maxSteps; step++) {
+            ModelStep s = callModel(userTask, history);
+
+            if (s.action == null) {                // 终止条件：模型不再调用工具
+                history.add("ANS: " + s.finalAnswer);
+                return s.finalAnswer;
+            }
+
+            // Thought / Action 记录
+            System.out.println("Step " + step + " Thought: " + s.thought);
+            System.out.println("Step " + step + " Action: " + s.action + "(" + s.arg + ")");
+
+            // 执行工具（真实场景含 try/catch 与超时）
+            String observation;
+            if ("getWeather".equals(s.action)) {
+                observation = tools.getWeather(s.arg);
+            } else if ("adviseSport".equals(s.action)) {
+                observation = tools.adviseSport(s.arg);
+            } else {
+                observation = "ERROR: 未知工具 " + s.action;
+            }
+            System.out.println("Step " + step + " Observation: " + observation);
+
+            history.add("THOUGHT: " + s.thought);
+            history.add("ACT: " + s.action + "(" + s.arg + ")");
+            history.add("OBS:" + s.action + " " + observation);  // 供下次决策参考
+        }
+        return "⚠️ 达到最大步数 " + maxSteps + " 仍未完成，请检查任务或放宽限制。";
+    }
+
+    public static void main(String[] args) {
+        String ans = run("北京今天天气如何，适合户外运动吗？", 10);
+        System.out.println("最终回答: " + ans);
+    }
+}
+```
+
+要点解读：
+- **循环结构**：`for` 循环即 ReAct 循环；每轮 `callModel` 决定"继续行动 or 结束"。
+- **最大步数 `maxSteps`**：防止模型陷入死循环无限烧钱，是 Agent 的必备安全闸。
+- **终止条件**：模型输出 `action == null`（Final Answer）即停止；否则继续。
+- **history**：把 Thought/Action/Observation 累积回传，模拟"记忆"，让下一步决策有依据。
+- **真实落地**：把 `callModel` 换成"拼 prompt + 调 LLM + 解析 tool_calls"，把 `ToolBox` 换成真实工具集即可。
+
+---
+
+### 5.7 框架对比与选型建议
+
+| 方案 | 定位 | 语言 | 适合人群 | 优点 | 缺点 |
+|------|------|------|---------|------|------|
+| 原生 API（HTTP 直调） | 最底层、最灵活 | 任意 | 想彻底理解原理、对接非标接口 | 零框架依赖、完全可控 | 样板代码多、易出 messages 拼接 bug |
+| LangChain4j | Java 生态最成熟 LLM 框架 | Java | 纯 Java 团队、快速集成 | AiServices 极简、工具/记忆/RAG 齐全 | 抽象层多、版本迭代快 |
+| Spring AI | Spring 官方 AI 抽象 | Java | 已有 Spring Boot 项目 | 与 Spring 生态无缝、可换模型 | 相对年轻、部分高级特性仍在完善 |
+| Python CrewAI | 多 Agent 协作框架 | Python | 做多角色 Agent 编排 | 多 Agent 角色/流程开箱即用 | 非 JVM、需另起 Python 服务 |
+
+**给 Java 开发者的选型建议：**
+1. **已有 Spring Boot 项目** → 优先 **Spring AI**，贴合现有技术栈，迁移成本低。
+2. **想最快跑通工具/Agent、重视生态完整** → 选 **LangChain4j**（本文示例即用它）。
+3. **要深度定制协议或对接私有模型** → 用**原生 API** 打底，必要时自封装。
+4. **重点做多 Agent 团队编排** → 可考虑 **CrewAI**，但需接受 Java/Python 混合架构（或等 JVM 生态补齐）。
+
+实际工业项目常见组合：**Spring Boot + Spring AI/LangChain4j 做主服务，原生 API 做特殊适配。**
+
+---
+
+### 5.8 实战项目建议
+
+下面给两个"综合 Agent"练手项目，难度适中、能覆盖本章全部知识点。
+
+#### 项目一：个人助理 Agent
+- **能力**：查天气、查日历、记待办、发提醒邮件。
+- **架构**：
+```mermaid
+flowchart LR
+    U["用户语音/文字"] --> A["Agent 主控<br/>(ReAct 循环)"]
+    A --> W["天气工具"]
+    A --> C["日历工具"]
+    A --> T["待办存储(长期记忆)"]
+    A --> M["邮件工具"]
+    A --> Mem["短期对话历史"]
+```
+- **知识点覆盖**：多工具选择、记忆（待办=长期）、规划（"提醒我明天跑步"需查日历+写待办+发邮件）。
+
+#### 项目二：代码审查机器人 Agent
+- **能力**：拉取 PR  diff → 调用 LLM 分析 → 结合项目规范文档（向量检索）→ 输出审查意见 → 提交评论。
+- **角色分工（多 Agent）**：Retriever（检索规范）、Reviewer（审代码）、Summarizer（汇总评论）。
+- **知识点覆盖**：多 Agent 协作、向量记忆（RAG）、工具出错处理（API 限流重试）。
+
+> 做项目时牢记安全：**给工具加权限边界与超时**，不要让 Agent 拥有不受控的"删库/发件"能力；先用沙箱环境验证。
+
+---
+
+### 5.9 本章小结
+
+- **Function Calling**：模型输出结构化 JSON 指令（`name` + `arguments`），由你的程序真正执行——模型是"指挥官"，程序是"执行者"。
+- **工具定义**用 JSON Schema 描述，`description` 写得好坏直接决定模型会不会用对工具。
+- **Agent** = 大模型 + 工具 + 记忆 + 规划/推理循环；**ReAct** 用 Thought/Action/Observation 实现多步自主任务。
+- 记忆分短期/长期向量/摘要三类，各有适用场景；能单次工具解决就别上 Agent。
+- 多 Agent 通过角色分工（Planner/Executor/Reviewer）协作，适合复杂质量敏感任务。
+- Java 落地优先 **Spring AI / LangChain4j**，务必给 Agent 加最大步数与超时等安全闸。
+
+---
+
+### 5.10 自测题
+
+1. **判断并说明**：大模型在 Function Calling 时，是真的在"运行"你的 Java 函数吗？请描述真实的执行链路。
+2. **改错题**：下面是一个天气工具的 `description`："获取天气"。请从"模型能否正确选择工具"的角度，说明它的问题，并写出一个改进版。
+3. **时序题**：在 Function Calling 的第二次 API 请求中，`messages` 数组应当包含哪几条消息？如果漏掉 `role: assistant`（带 tool_calls）那一条，会发生什么？
+4. **设计题**：你要做一个"根据用户问题自动查数据库并生成图表"的功能。请判断应该用"单次 Function Calling"还是"完整 Agent"，并说明理由。
+5. **代码题（简述）**：在 ReAct Agent 中，"最大步数（maxSteps）"的作用是什么？如果去掉它，可能出现什么风险？请结合"工具出错陷入死循环"的场景说明。
+## 第 6 章：流式输出与生产化 —— 从 Demo 到上线
+
+> 在前 5 章中，你已经学会用 Spring AI / 前端调用大模型完成一次问答。但那只是"Demo 形态"：用户点击按钮，浏览器转圈几秒甚至几十秒，然后一次性吐出整段答案。当真实用户使用你的产品时，这种体验会让人以为"程序卡死了"。本章要解决的，正是**如何把一次 LLM 调用从"同步阻塞"改造成"流式输出"**，以及围绕它的一整套生产化能力：缓存、限流、成本、可观测性、重试与部署。
+
+---
+
+### 6.1 流式输出（Streaming）原理深解
+
+#### 6.1.1 为什么需要流式
+
+大模型（LLM）在底层是**逐 token（词元）生成**的：它先预测第 1 个 token，再基于前面所有 token 预测第 2 个，依此类推，直到生成"结束符"。一个百字回答，背后可能是上百次"前向推理"。
+
+在**同步（普通）模式**下，服务端会等到所有 token 生成完毕，把完整文本拼成 JSON 一次性返回。假设一次回答需要 8 秒，那么前端要"白屏 8 秒"才能看到任何内容。
+
+在**流式模式**下，服务端每生成 1 个（或一小批）token，就立刻通过 HTTP 连接推给前端，前端边收边渲染。用户在第 0.3 秒就能看到第一个字，体验从"卡死"变成"打字机"。
+
+| 维度 | 同步响应 | 流式响应 |
+| --- | --- | --- |
+| 首字可见延迟 | 等于整体耗时（如 8s） | ≈ 首 token 耗时（如 0.3s） |
+| 连接占用 | 长连接但"静默等待" | 长连接但持续有数据 |
+| 用户感知 | "卡住了？" | "正在打字" |
+| 取消能力 | 难（已占满后端算力） | 易（发个取消即可中断） |
+| 实现复杂度 | 低 | 中（需 SSE/WS + 逐块解析） |
+
+> 结论：**凡是面向真实用户的对话类产品，流式输出几乎是必选项。**
+
+#### 6.1.2 SSE（Server-Sent Events）协议原理
+
+SSE 是浏览器原生支持的单向（服务端→客户端）流式协议，基于普通 HTTP，比 WebSocket 轻量得多。它的核心 MIME 类型是 `text/event-stream`，数据用纯文本发送，每条消息形如：
+
+```
+data: {"content":"你好"}
+
+data: {"content":"，世界"}
+
+event: done
+data: [DONE]
+```
+
+要点：
+- 每条消息以 `data:` 开头，多个 `data:` 行会被拼接；消息以**空行（两个换行）**分隔。
+- 可选 `event:` 指定事件名，`id:` 用于断线重连，`retry:` 指定重连毫秒。
+- **心跳**：长时间无数据时，服务端可周期性发送注释行 `:\n\n`（以冒号开头的注释行会被客户端忽略），防止中间代理（Nginx）因空闲断开连接。
+
+下面用 Mermaid 展示一次 SSE 数据流：
+
+```mermaid
+sequenceDiagram
+    participant U as 前端(fetch)
+    participant S as Spring Boot
+    participant LLM as 大模型 API
+    U->>S: GET /chat/stream (Accept: text/event-stream)
+    S->>LLM: POST /v1/chat/completions (stream=true)
+    LLM-->>S: chunk1: data:{..."你好"}
+    S-->>U: data: {"content":"你好"}
+    LLM-->>S: chunk2: data:{..."，世界"}
+    S-->>U: data: {"content":"，世界"}
+    LLM-->>S: data: [DONE]
+    S-->>U: data: [DONE]
+    S-->>U: (连接关闭)
+```
+
+#### 6.1.3 WebSocket vs SSE 对比
+
+| 维度 | SSE | WebSocket |
+| --- | --- | --- |
+| 方向 | 单向（服务端→客户端） | 双向（全双工） |
+| 协议基础 | 普通 HTTP（易走 CDN/网关） | 独立 `ws://` 协议，需升级握手 |
+| 浏览器 API | 原生 `EventSource`（自动重连） | 需手写 `WebSocket` |
+| 断线重连 | 原生支持 | 需自己实现 |
+| 适合场景 | LLM 逐字输出、通知推送 | 多人聊天、游戏、协同编辑 |
+| 复杂度 | 低 | 中高 |
+
+> AI 对话场景绝大多数是"单向流"，**优先选 SSE**。只有需要"前端随时打断/双向控制信道"时才上 WebSocket。
+
+#### 6.1.4 后端：Spring Boot WebFlux 流式返回
+
+Spring Boot 3 + WebFlux 对 SSE 有原生支持：控制器方法返回 `Flux<String>`，并标注 `produces = MediaType.TEXT_EVENT_STREAM_VALUE`。下面代码演示：把 DeepSeek/OpenAI 的流式响应（`data: {...}` 行）逐 chunk 解析，提取 `choices[0].delta.content`，转发为 SSE 给前端，遇到 `[DONE]` 终止。
+
+```java
+// ChatController.java  (Spring Boot 3 / WebFlux)
+@RestController
+@RequestMapping("/api/chat")
+public class ChatController {
+
+    private final WebClient llmClient =
+        WebClient.builder().baseUrl("https://api.deepseek.com").build();
+
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> stream(@RequestParam String question) {
+        // 1) 构造请求体，开启 stream=true
+        Map<String, Object> body = Map.of(
+            "model", "deepseek-chat",
+            "stream", true,
+            "messages", List.of(
+                Map.of("role", "user", "content", question))
+        );
+
+        return llmClient.post()
+            .uri("/v1/chat/completions")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(body)
+            .retrieve()
+            .bodyToFlux(String.class)            // 原始 SSE 文本行
+            .map(this::parseChunk)               // 解析出 content / 检测 [DONE]
+            .takeUntil("__DONE__"::equals)       // 遇到终止标记即结束流
+            .filter(s -> !"__DONE__".equals(s))
+            .map(content -> "data: " + content + "\n\n"); // 封装为 SSE 格式
+    }
+
+    // 解析单行： "data: {...}" 或 "data: [DONE]"
+    private String parseChunk(String raw) {
+        if (raw == null) return "";
+        String line = raw.startsWith("data:") ? raw.substring(5).trim() : raw.trim();
+        if ("[DONE]".equals(line)) return "__DONE__";
+        try {
+            JsonNode node = new ObjectMapper().readTree(line);
+            JsonNode delta = node.path("choices").path(0).path("delta").path("content");
+            return delta.isMissingNode() ? "" : delta.asText();
+        } catch (Exception e) {
+            return "";   // 忽略心跳/注释行等
+        }
+    }
+}
+```
+
+> 说明：真实项目建议用 Spring AI 的 `ChatClient.stream()`，它会帮你处理 `[DONE]` 和 JSON 解析，返回 `Flux<ChatResponse>`，代码更简洁。上面手写版是为了展示**协议层原理**。
+
+#### 6.1.5 前端：fetch + ReadableStream 逐字追加
+
+`EventSource` 只支持 GET，若你的接口是 POST（带 body），要用 `fetch` + `ReadableStream` 手动读流：
+
+```html
+<!-- chat.html -->
+<div id="bubble" class="bubble"></div>
+<script>
+async function send(question) {
+  const bubble = document.getElementById('bubble');
+  bubble.textContent = '';
+  const resp = await fetch('/api/chat/stream?question=' + encodeURIComponent(question));
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    // 按 SSE 空行分块
+    let idx;
+    while ((idx = buffer.indexOf('\n\n')) !== -1) {
+      const frame = buffer.slice(0, idx).trim();
+      buffer = buffer.slice(idx + 2);
+      if (frame.startsWith('data:')) {
+        const text = frame.slice(5).trim();
+        if (text === '[DONE]') return;
+        bubble.textContent += text;   // 逐字追加进聊天气泡
+      }
+    }
+  }
+}
+</script>
+```
+
+#### 6.1.6 流式输出的三大工程问题
+
+1. **如何取消**：前端用 `AbortController`，`reader.cancel()` 会断开连接；后端 SSE 流要监听 `Flux` 的 `doOnCancel()`，主动中断对上游 LLM 的请求（WebClient 本身可在取消时释放连接，避免"用户走了但算力还在跑"）。
+2. **如何处理错误**：流中途 LLM 报错时，不要静默断流，应发送一个 `event: error` 帧或在 JSON 里带 `error` 字段，前端据此展示"生成失败，请重试"并停止追加。
+3. **如何做限流**：流是长连接，常规"QPS 限流"不够，需按**并发连接数**或**用户级 Token 桶**限流（见 6.3），否则少数用户可占满全部出站带宽与模型配额。
+
+---
+
+### 6.2 语义缓存（Semantic Cache）原理与实现
+
+#### 6.2.1 原理
+
+普通缓存靠"完全相等"的 key 命中（如 Redis 的 `GET question`）。但用户问"北京天气"和"北京今天天气怎么样"语义相同、字符串不同，精确缓存打不中，却会重复花钱调用 LLM。
+
+**语义缓存**的做法：
+1. 把问题用 Embedding 模型转成向量（如 1536 维）。
+2. 缓存里存 `(向量, 问题, 答案)`。
+3. 新问题来了，算它与缓存问题向量的**余弦相似度**；若 `相似度 > 阈值（如 0.95）`，直接返回缓存答案，省一次 API 调用。
+
+```
+余弦相似度 = (A · B) / (|A| × |B|)   ∈ [-1, 1]，越接近 1 越相似
+```
+
+| 缓存类型 | Key 方式 | 命中条件 | 适合场景 |
+| --- | --- | --- | --- |
+| 精确缓存 | 原文字符串 | 完全相同 | 幂等接口、固定模板 |
+| Redis 缓存 | 任意 key（含哈希） | key 相等 | 通用 KV |
+| 语义缓存 | 向量 | 语义相似 > 阈值 | LLM 问答、FAQ |
+
+#### 6.2.2 Java 实现（Embedding + 余弦 + 存储）
+
+下面用 `ConcurrentHashMap` 做内存版（生产可替换为 Redis + 向量检索）：
+
+```java
+// SemanticCache.java
+public class SemanticCache {
+    private final EmbeddingClient embed; // Spring AI EmbeddingClient
+    private final Map<String, CacheEntry> store = new ConcurrentHashMap<>();
+    private final double threshold = 0.95;
+
+    public String get(String question) {
+        float[] q = embed.embed(question);
+        for (CacheEntry e : store.values()) {
+            if (cosine(q, e.vector) >= threshold) return e.answer; // 命中
+        }
+        return null; // 未命中
+    }
+
+    public void put(String question, String answer) {
+        store.put(question, new CacheEntry(embed.embed(question), question, answer));
+    }
+
+    private double cosine(float[] a, float[] b) {
+        double dot = 0, na = 0, nb = 0;
+        for (int i = 0; i < a.length; i++) {
+            dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i];
+        }
+        return dot / (Math.sqrt(na) * Math.sqrt(nb));
+    }
+
+    record CacheEntry(float[] vector, String question, String answer) {}
+}
+```
+
+调用处：先查语义缓存，未命中再调 LLM 并回填。
+
+```java
+String ans = cache.get(question);
+if (ans == null) {
+    ans = chatClient.prompt(question).call().content();
+    cache.put(question, ans);
+}
+```
+
+#### 6.2.3 缓存失效与更新
+
+- **TTL 过期**：知识会过时，给每条缓存加过期时间（如 24h）。
+- **主动失效**：知识库更新时，按业务 tag 批量清除相关条目。
+- **质量过滤**：只缓存"被用户点赞/未被举报"的答案，避免把错误答案长期复用。
+- **阈值调优**：阈值过低会"答非所问"，过高则命中率低；建议从 0.92 起步，结合线上日志调。
+
+---
+
+### 6.3 限流（Rate Limiting）算法对比
+
+#### 6.3.1 四种算法原理
+
+```mermaid
+flowchart LR
+    subgraph 固定窗口
+        A1[0s-1s: 计数0] --> A2[请求+1...] --> A3[到窗口边界清零]
+    end
+    subgraph 滑动窗口
+        B1[按时间戳入队] --> B2[剔除窗口外] --> B3[统计数量]
+    end
+    subgraph 漏桶
+        C1[请求入桶] --> C2[匀速流出] --> C3[溢出则拒绝]
+    end
+    subgraph 令牌桶
+        D1[匀速放令牌] --> D2[有令牌才放行] --> D3[空了则拒绝/排队]
+    end
+```
+
+| 算法 | 原理 | 优点 | 缺点 | 适合 |
+| --- | --- | --- | --- | --- |
+| 固定窗口 | 时间窗口内计数，到边界清零 | 实现最简单 | 窗口临界点**双倍突发**（如 59s+1s 各满） | 粗粒度保护 |
+| 滑动窗口 | 按时间戳统计最近 N 秒请求 | 平滑、无临界突刺 | 需存时间戳，内存稍高 | 精确限流 |
+| 漏桶 | 请求入桶，匀速流出，溢出拒绝 | 输出速率恒定，平滑流量 | 突发友好性差 | 保护下游、整形 |
+| 令牌桶 | 匀速放令牌，取到才放行 | 允许一定**突发**，最常用 | 需维护令牌数 | 通用 API 限流 |
+
+#### 6.3.2 Java 令牌桶实现（手写）
+
+```java
+// TokenBucket.java
+public class TokenBucket {
+    private final long capacity;        // 桶容量
+    private final double refillRate;    // 每秒补充令牌数
+    private double tokens;
+    private long lastRefill;
+
+    public TokenBucket(long capacity, double refillRate) {
+        this.capacity = capacity; this.refillRate = refillRate;
+        this.tokens = capacity; this.lastRefill = System.nanoTime();
+    }
+
+    public synchronized boolean tryAcquire() {
+        refill();
+        if (tokens >= 1) { tokens -= 1; return true; }
+        return false;
+    }
+
+    private void refill() {
+        long now = System.nanoTime();
+        double secs = (now - lastRefill) / 1e9;
+        tokens = Math.min(capacity, tokens + secs * refillRate);
+        lastRefill = now;
+    }
+}
+```
+
+> 生产环境推荐 **Resilience4j** 的 `RateLimiter`（`@RateLimiter(name="llmApi")`），它已实现令牌桶并支持 `waitForPermission`。也可直接用 Spring Cloud Gateway 的 `RequestRateLimiter` 过滤器（基于 Redis）。
+
+#### 6.3.3 用户级 + 全局级限流
+
+- **用户级**：每个 `userId` 一个令牌桶（如 20 次/分钟），防单用户刷爆。
+- **全局级**：整个服务一个桶（如 1000 次/分钟），防总量超模型配额。
+- 两层**同时**判断，任一拒绝即 429。可用 `Map<userId, TokenBucket>` 实现用户级，配合一个全局 `TokenBucket`。
+
+---
+
+### 6.4 Token 计费与成本优化
+
+#### 6.4.1 Token 如何计费
+
+模型按 **token 数** 计费，且**输入（prompt）和输出（completion）分开计价**。一个中文汉字约 0.6~1.5 个 token，英文单词约 1 个。示例（示意价）：输入 ¥0.014/千 token，输出 ¥0.028/千 token。
+
+#### 6.4.2 成本优化清单
+
+1. **短模型优先**：能用 7B/小模型解决的（分类、抽取），别用旗舰大模型。
+2. **限制 `max_tokens`**：防止模型"话痨"拉长输出。
+3. **语义缓存**：重复问题零成本（见 6.2）。
+4. **Prompt 压缩**：精简系统提示、去掉冗余示例；长文档用 RAG 只取相关片段。
+5. **批量 API（Batch）**：非实时任务走批量接口，价格常打 5 折。
+6. **复用上下文**：多轮对话避免重复发送完整历史，可只发增量。
+
+#### 6.4.3 成本估算小例子
+
+假设：1 万用户，每人每天 10 次对话，每次平均输入 500 token + 输出 300 token。
+
+- 日调用次数：`10,000 × 10 = 100,000` 次
+- 日输入 token：`100,000 × 500 = 5,000 万`
+- 日输出 token：`100,000 × 300 = 3,000 万`
+- 日费用：`(50,000 × 0.014) + (30,000 × 0.028)` = `700 + 840` = **¥1,540 / 天**
+- 月费用 ≈ **¥4.6 万**（未计缓存命中节省；若语义缓存命中率 30%，可省约 ¥1.4 万/月）。
+
+---
+
+### 6.5 可观测性（Observability）与评估
+
+#### 6.5.1 为什么要监控
+
+LLM 应用"看不见内部状态"：Token 偷偷涨、延迟突然高、偶发幻觉。必须量化。核心监控对象：**Token 消耗、首 token 延迟、错误率、幻觉率、成本**。
+
+#### 6.5.2 LLM 调用追踪
+
+- **Spring AI Observation**：集成 Micrometer，自动为每个 `ChatClient` 调用生成 `gen_ai` 语义约定指标（模型名、token 数、耗时），对接 Prometheus + Grafana。
+- **LangSmith 思路**：把每次调用的 prompt、响应、token、耗时、父子链路全记录下来，支持回放与对比；自建可用 OpenTelemetry traces 实现类似能力。
+
+#### 6.5.3 关键指标
+
+| 指标 | 含义 | 关注点 |
+| --- | --- | --- |
+| TTFT（首 token 延迟） | 请求到首个字符的时间 | 用户体验核心 |
+| 吞吐 (tokens/s) | 每秒生成 token | 模型/网络性能 |
+| 成本/请求 | 单次调用平均花费 | 预算控制 |
+| 错误率 / 429 率 | 失败占比 | 限流与健康 |
+
+下面用一张图串联"采集 → 存储 → 告警"的监控链路：
+
+```mermaid
+flowchart LR
+    APP[Spring Boot 应用] -->|Micrometer 指标| PROM[(Prometheus)]
+    APP -->|Trace / Span| OTEL[(OpenTelemetry)]
+    PROM --> GRAF[Grafana 看板]
+    OTEL --> GRAF
+    PROM --> ALERT[Alertmanager 告警<br/>429率 / P99延迟 / 费用突增]
+    ALERT --> NOTIFY[钉钉 / 邮件 / 电话]
+```
+
+#### 6.5.4 评估方法：LLM-as-Judge
+
+用**另一个更强的 LLM 当评委**，对回答从"相关性、正确性、无害性"打分（0~5）。先把标准写成 rubric，再批量跑裁判，得到可量化的质量趋势。注意：评委本身也会出错，关键场景仍需人工抽检。
+
+---
+
+### 6.6 错误重试与退避
+
+LLM API 常见问题：**429（限流）**、**5xx（服务端抖动）**、**超时**。盲目立即重试会雪上加霜，**指数退避（Exponential Backoff）** 让重试间隔随次数指数增长，并加随机抖动（jitter）避免"重试风暴"。
+
+公式：`等待 = base × 2^尝试次数 + 随机抖动`，并设置最大重试次数与上限。
+
+```java
+// RetryUtils.java —— 手写指数退避
+public class RetryUtils {
+    public static <T> T withRetry(Supplier<T> task, int maxAttempts) {
+        long base = 500; // ms
+        for (int i = 0; i < maxAttempts; i++) {
+            try {
+                return task.get();
+            } catch (Exception e) {
+                boolean retryable = isRetryable(e); // 429 / 5xx / 超时
+                if (!retryable || i == maxAttempts - 1) throw e;
+                long wait = base * (1L << i) + (long)(Math.random() * base);
+                try { Thread.sleep(wait); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); throw e; }
+            }
+        }
+        throw new IllegalStateException("unreachable");
+    }
+
+    private static boolean isRetryable(Exception e) {
+        // 可结合 HttpStatus：429 / 500 / 502 / 503 / 504 与 SocketTimeoutException
+        return e instanceof SocketTimeoutException
+            || (e instanceof ResponseStatusException r && (r.getStatusCode().is5xxServerError() || r.getStatusCode().value() == 429));
+    }
+}
+```
+
+> 生产推荐 **Resilience4j Retry**（`@Retry(name="llm", maxAttempts=3)`）配合 `RetryConfig` 配置退避与可重试异常，比手写更稳健。
+
+---
+
+### 6.7 部署架构
+
+#### 6.7.1 部署架构图
+
+```mermaid
+flowchart TB
+    U[用户 / 前端] --> GW[API 网关 / 限流 / 鉴权]
+    GW --> APP[Spring Boot 应用<br/>流式 + 缓存 + 限流 + 重试]
+    APP --> LLM[大模型 API<br/>DeepSeek / OpenAI]
+    APP --> VEC[(向量库<br/>pgvector / Chroma)]
+    APP --> CACHE[(Redis<br/>语义缓存 + 限流计数)]
+    APP --> OBS[可观测性<br/>Prometheus + Grafana + Trace]
+    APP -. 指标/日志 .-> OBS
+```
+
+#### 6.7.2 Docker Compose 示例
+
+```yaml
+# docker-compose.yml
+version: "3.9"
+services:
+  app:
+    build: .
+    ports: ["8080:8080"]
+    environment:
+      - SPRING_REDIS_HOST=redis
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pg:5432/ai
+      - LLM_API_KEY=${LLM_API_KEY}
+    depends_on: [redis, pg]
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  pg:
+    image: pgvector/pgvector:pg16
+    environment:
+      - POSTGRES_DB=ai
+      - POSTGRES_PASSWORD=secret
+    ports: ["5432:5432"]
+
+  chroma:
+    image: chromadb/chroma:latest
+    ports: ["8000:8000"]
+```
+
+#### 6.7.3 K8s 与 HPA 自动扩缩容
+
+把 `app` 打成镜像部署为 Deployment，配合 **HPA（HorizontalPodAutoscaler）** 按 CPU/内存或自定义指标（如并发连接数）自动增减副本：
+
+```yaml
+# hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: llm-app }
+spec:
+  scaleTargetRef: { kind: Deployment, apiVersion: apps/v1, name: llm-app }
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }
+```
+
+> 注意：HPA 扩的是"应用副本"，**模型配额本身无法水平扩展**，因此限流（6.3）仍是保护上游的最后一道闸。
+
+---
+
+### 6.8 生产就绪检查清单
+
+**安全**
+- [ ] API Key 存放于密钥管理（Vault/环境变量），不入库、不进前端
+- [ ] 用户输入做注入防护与内容审核，防 Prompt 注入
+- [ ] 接口鉴权 + 用户级限流，防滥用
+
+**成本**
+- [ ] 已启用语义缓存；已设 `max_tokens`
+- [ ] 有 Token/费用看板，设预算告警
+- [ ] 非实时任务走 Batch 接口
+
+**性能**
+- [ ] 流式输出已落地（TTFT 受控）
+- [ ] 连接池、超时（connect/read）已配置
+- [ ] 网关/应用层限流已生效
+
+**可观测性**
+- [ ] Token、延迟、错误率、成本指标接入监控
+- [ ] 调用链追踪（Trace）可回放
+- [ ] 有关键告警（429 率、P99 延迟、费用突增）
+
+**容错**
+- [ ] 指数退避重试（429/5xx/超时）
+- [ ] 模型降级策略（主模型失败时降级小模型）
+- [ ] 上游不可用时返回友好错误而非崩溃
+
+---
+
+### 6.9 本章自测题
+
+1. **概念**：SSE 与 WebSocket 最主要的区别是什么？为什么 AI 对话场景通常优先选 SSE？
+2. **协议**：SSE 消息以什么字符作为单条消息的分隔？如何用注释行实现心跳？
+3. **缓存**：语义缓存与传统 Redis 精确缓存在"命中条件"上有何本质不同？阈值设得过低会带来什么问题？
+4. **限流**：固定窗口限流在"窗口临界时刻"会出现什么缺陷？令牌桶相比它有何优势？
+5. **成本/容错**：某接口每秒最多 5 次调用，某用户在第 0.9 秒连发 5 次、第 1.1 秒又连发 5 次，固定窗口限流会如何处理？这种设计风险在哪？指数退避如何缓解上游限流（429）带来的雪崩？
+
+---
+
+> **本章小结**：从"能跑"到"能上线"，关键不只是流式输出本身，而是一整条链路——SSE 让体验顺滑，语义缓存与限流守住成本与稳定性，可观测性让你"看得见"，重试与降级让你"扛得住"，容器化与 HPA 让你"扩得开"。下一章我们将进入 RAG（检索增强生成），把"模型不知道的知识"接进来。
+## 第 7 章：GitHub 实战项目推荐 —— 向优秀开源项目学习
+
+> ⏱ 预计时间：持续关注 | 🎯 目标：找到适合自己水平的开源项目，边看边学
+
+学完前面 6 章后，你已经能独立搭建 AI 应用了。但自己闷头写代码进步有限——**阅读优秀的开源项目，是提升最快的途径之一**。
+
+本章精选了 GitHub 上最适合 Java + 前端背景学习者的 AI 开源项目，按难度和用途分类。
+
+---
+
+### 7.1 项目总览
+
+```
+难度  ★☆☆          ★★☆              ★★★
+      │              │                 │
+  快速体验型      教程/学习型       生产级平台型
+  (点点就能用)   (跟着代码学)      (阅读源码提升)
+```
+
+| 难度 | 适合人群 | 学习方式 |
+|------|---------|----------|
+| ★☆☆ | 刚入门，想先体验 AI 应用长什么样 | 部署运行，理解功能 |
+| ★★☆ | 有一定基础，想跟着代码学习 | Clone + 运行 + 调试 + 修改 |
+| ★★★ | 想深入理解架构设计 | 阅读源码，学习设计模式 |
+
+---
+
+### 7.2 Java 后端项目（与你的技术栈完美匹配）
+
+#### 🌟 首推：llm-apps-java-spring-ai
+
+| 项目信息 | 详情 |
+|----------|------|
+| **GitHub** | [ThomasVitale/llm-apps-java-spring-ai](https://github.com/ThomasVitale/llm-apps-java-spring-ai) |
+| **难度** | ★★☆ |
+| **技术栈** | Spring Boot 3 + Spring AI + Ollama + PGVector + OpenAI |
+| **推荐理由** | **Java AI 学习最佳项目，没有之一！** 56 个可运行示例，覆盖手册第 0-6 章全部内容 |
+
+**项目包含的示例（直接对应本手册各章）**：
+
+| 分类 | 示例数量 | 对应手册章节 | 亮点示例 |
+|------|---------|-------------|---------|
+| 用例 (Use Cases) | 5 个 | 第 2、4 章 | Chatbot、RAG 问答、语义搜索、文本分类 |
+| 模型集成 (Models) | 10 个 | 第 1、2 章 | OpenAI / Ollama / Mistral AI 三套方案 |
+| Prompt 设计模式 | ~25 个 | 第 3 章 | 模板、结构化输出、多模态、消息角色 |
+| Tool Calling | 3 个 | 第 5 章 | OpenAI / Ollama / Mistral 三种实现 |
+| 记忆 (Memory) | 4 个 | 第 5 章 | 基础记忆、JDBC、向量存储、Spring Security |
+| RAG 流程 | 4 个 | 第 4 章 | 朴素 RAG、高级 RAG、分支 RAG、条件 RAG |
+| 数据摄取 | 7 个 | 第 4 章 | JSON/Markdown/PDF/Tika 文档读取与分块 |
+| 护栏 (Guardrails) | 2 个 | 第 6 章 | 输入护栏、输出护栏 |
+| 可观测性 | 4 个 | 第 6 章 | 模型调用监控、向量存储监控 |
+
+> **学习建议**：每学完手册一章，就去这个项目找对应示例运行一遍。从 `use-cases/chatbot` 开始，逐步深入。
+
+---
+
+#### 🌟 推荐二：LangChat/ai-tutorials
+
+| 项目信息 | 详情 |
+|----------|------|
+| **GitHub** | [LangChat/ai-tutorials](https://github.com/LangChat/ai-tutorials) |
+| **在线文档** | [ai-tutorials.langchat.cn](https://ai-tutorials.langchat.cn/) |
+| **难度** | ★★☆ |
+| **技术栈** | Java 17 + Maven + LangChain4j 1.10 + JUnit 5 |
+| **推荐理由** | **中文友好，0 基础上手，40 篇文档 + 完整测试代码** |
+
+**教程目录（部分）**：
+
+```
+01 - LangChain4j 简介
+02 - 第一个聊天应用
+03 - ChatModel 深入（含流式聊天）
+07 - Embedding 模型
+08 - 向量存储
+10 - RAG 检索增强生成
+11 - AI Services 声明式服务
+... (共 40 篇)
+```
+
+**项目特点**：
+- 每个主题都有**独立的测试类**，可以直接运行
+- 使用 `.env` 文件统一管理配置，安全规范
+- 支持 DeepSeek、OpenAI、通义千问等多种模型
+- 代码风格好，有 Lombok、JUnit DisplayName 等最佳实践
+
+> **学习建议**：先看在线文档理解概念，再 clone 代码运行测试，最后自己改参数实验。非常适合配合本手册第 2-5 章同步学习。
+
+---
+
+#### 🌟 推荐三：yu-ai-agent（AI 超级智能体）
+
+| 项目信息 | 详情 |
+|----------|------|
+| **GitHub** | [liyupi/yu-ai-agent](https://github.com/liyupi/yu-ai-agent) |
+| **难度** | ★★★ |
+| **技术栈** | Java 21 + Spring Boot 3 + Spring AI + LangChain4j + PgVector + MCP |
+| **推荐理由** | **完整全栈 AI 项目，从 0 到 1 构建 Agent** |
+
+**项目内容**：
+- **AI 恋爱大师应用**：多轮对话 + RAG 知识库 + 工具调用 + MCP 服务
+- **YuManus 自主智能体**：基于 ReAct 模式，能自主搜索、下载、生成 PDF
+- 配套完整视频教程 + 文字教程
+
+**学习大纲**（9 期）：
+1. 项目总览与架构设计
+2. AI 大模型接入（4 种方式）+ 本地部署
+3. AI 应用开发：Prompt 工程 + 多轮对话 + 结构化输出
+4. RAG 知识库基础：Spring AI + 本地/云知识库
+5. RAG 知识库进阶：ETL + 向量数据库 + 检索策略调优
+6. 工具调用：6 种工具开发（搜索、文件、抓取、终端、下载、PDF）
+7. MCP 协议：3 种使用方式 + MCP Server 开发
+8. AI 智能体构建：ReAct + OpenManus 原理 + 自主实现
+9. AI 服务化：SSE 接口 + 前端 + Docker + Serverless 部署
+
+> **学习建议**：完成本手册前 6 章后再来看这个项目。它相当于把你学的所有知识串成一个完整的全栈产品，是**简历项目的绝佳素材**。
+
+---
+
+#### 🌟 推荐四：langchain4j-examples（官方示例）
+
+| 项目信息 | 详情 |
+|----------|------|
+| **GitHub** | [langchain4j/langchain4j-examples](https://github.com/langchain4j/langchain4j-examples) |
+| **难度** | ★★☆ |
+| **技术栈** | Java + LangChain4j + 多种模型 |
+| **推荐理由** | LangChain4j 官方出品，示例最权威 |
+
+包含：Chat Models、Embedding、RAG、Tools、Agents、Image Models、Audio Models 等全方位示例。
+
+---
+
+#### 🌟 推荐五：spring-ai-community/awesome-spring-ai
+
+| 项目信息 | 详情 |
+|----------|------|
+| **GitHub** | [spring-ai-community/awesome-spring-ai](https://github.com/spring-ai-community/awesome-spring-ai) |
+| **难度** | ★☆☆ |
+| **推荐理由** | 不是项目，是**资源索引**——收集了 Spring AI 生态的所有教程、工具、项目 |
+
+当你不知道用什么库、看什么教程时，来这里搜就对了。
+
+---
+
+### 7.3 前端项目（发挥你的前端优势）
+
+#### 🌟 Lobe Chat —— 开源 ChatGPT 替代品
+
+| 项目信息 | 详情 |
+|----------|------|
+| **GitHub** | [lobehub/lobe-chat](https://github.com/lobehub/lobe-chat) |
+| **难度** | ★★☆ |
+| **Star** | 63K+ |
+| **技术栈** | React + TypeScript + Next.js + shadcn/ui |
+| **推荐理由** | **最好的 AI 聊天前端开源项目，UI 精美，功能完整** |
+
+**你可以学到**：
+- AI 聊天界面的完整前端架构
+- 多模型切换（OpenAI / Claude / Gemini / Ollama）
+- 流式输出（SSE）的前端实现
+- 插件系统和知识库的前端交互
+- PWA 离线支持、国际化、主题切换
+
+> **学习建议**：作为前端开发者，这个项目的 UI/UX 设计值得深入研究。你可以参考它的对话组件设计，用在自己的项目中。
+
+---
+
+#### 🌟 NextChat (ChatGPT-Next-Web)
+
+| 项目信息 | 详情 |
+|----------|------|
+| **GitHub** | [ChatGPTNextWeb/NextChat](https://github.com/ChatGPTNextWeb/NextChat) |
+| **难度** | ★★☆ |
+| **Star** | 80K+ |
+| **技术栈** | React + Next.js |
+| **推荐理由** | 部署最简单，5 分钟就能用上自己的 ChatGPT 套壳**
+
+特别适合快速搭建私有的 AI 聊天前端，支持一键 Vercel 部署。
+
+---
+
+#### 🌟 Shadcn Chatbot Kit
+
+| 项目信息 | 详情 |
+|----------|------|
+| **GitHub** | [blazity/shadcn-chatbot-kit](https://github.com/blazity/shadcn-chatbot-kit) |
+| **难度** | ★☆☆ |
+| **技术栈** | React + Next.js + shadcn/ui + Vercel AI SDK |
+| **推荐理由** | **拿来即用的聊天组件库**，基于 shadcn/ui 构建**
+
+如果你已经在用 shadcn/ui 做前端，这个库能让你几分钟搭出一个 AI 聊天界面。
+
+---
+
+### 7.4 平台型项目（理解 AI 产品全貌）
+
+这些项目比较大，不建议一上来就啃源码。可以先**部署使用**，理解功能和架构后再深入。
+
+| 项目 | GitHub | Star | 一句话介绍 | 适合你吗？ |
+|------|--------|------|-----------|-----------|
+| **Dify** | [langgenius/dify](https://github.com/langgenius/dify) | 60K+ | 可视化的 LLM 应用开发平台，拖拽式构建 AI 工作流 | ⭐ 强烈推荐！用它快速验证想法，再用 Java 自己实现 |
+| **FastGPT** | [labring/FastGPT](https://github.com/labring/FastGPT) | 20K+ | 专注知识库问答，开箱即用的 RAG 平台 | 如果你想快速搭建知识库，用这个比从零写快 10 倍 |
+| **MaxKB** | [1Panel-dev/MaxKB](https://github.com/1Panel-dev/MaxKB) | 12K+ | 国产开源知识库问答系统，支持 DeepSeek | 中文场景首选，可直接对接企业微信/钉钉 |
+| **Open WebUI** | [open-webui/open-webui](https://github.com/open-webui/open-webui) | 50K+ | 自托管 AI 聊天界面，功能全面 | 想部署私有的 ChatGPT 替代品就用它 |
+| **LangChat** | [LangChat/LangChat](https://github.com/LangChat/LangChat) | - | Java 生态的 AI 开发平台，LangChain4j 最佳实践 | Java 开发者必看，完整的 Java AI 全栈方案 |
+
+---
+
+### 7.5 Python 生态精品项目（拓宽视野）
+
+虽然你是 Java 开发者，但这些 Python 项目的**架构思想**值得学习。AI 领域很多创新先出现在 Python 生态。
+
+| 项目 | GitHub | 难度 | 值得学什么 |
+|------|--------|------|-----------|
+| **awesome-llm-apps** | [Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps) | ★★☆ | 18K+ Star，RAG 和 Agent 应用合集，每个都是独立小项目 |
+| **llama_index** | [run-llama/llama_index](https://github.com/run-llama/llama_index) | ★★★ | RAG 框架的架构设计，数据连接器的设计模式 |
+| **LangChain** | [langchain-ai/langchain](https://github.com/langchain-ai/langchain) | ★★★ | 理解 LangChain4j 之前，先了解 Python 版的设计哲学 |
+| **CrewAI** | [crewai/crewai](https://github.com/crewai/crewai) | ★★☆ | 多 Agent 协作的设计模式 |
+
+---
+
+### 7.6 学习路线图：这些项目怎么配合本手册学？
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ 阶段          本手册         配套 GitHub 项目               │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│ 概念入门      第 0-1 章      直接看手册即可                  │
+│     ↓                                                      │
+│ 第一个应用    第 2 章        llm-apps-java-spring-ai       │
+│                              → use-cases/chatbot           │
+│                              LangChat/ai-tutorials         │
+│                              → 02-第一个聊天应用             │
+│     ↓                                                      │
+│ Prompt 工程   第 3 章        llm-apps-java-spring-ai       │
+│                              → patterns/prompts-*          │
+│                              → patterns/structured-output-*│
+│     ↓                                                      │
+│ RAG 知识库    第 4 章        llm-apps-java-spring-ai       │
+│                              → rag-* (4 种 RAG 模式)       │
+│                              LangChat/ai-tutorials         │
+│                              → 07-Embedding + 08-向量存储   │
+│                              → 10-RAG                      │
+│     ↓                                                      │
+│ Agent         第 5 章        yu-ai-agent (完整 Agent 项目)  │
+│                              llm-apps-java-spring-ai       │
+│                              → patterns/tool-calling-*     │
+│     ↓                                                      │
+│ 生产化        第 6 章        yu-ai-agent → Docker/SSE      │
+│                              Dify/FastGPT → 部署体验        │
+│     ↓                                                      │
+│ 综合实战      第 7 章        yu-ai-agent (全栈完整项目)      │
+│                              Lobe Chat (前端参考)           │
+│                                                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 7.7 如何高效学习开源项目？
+
+**三步法**：
+
+1. **先跑起来**（30 分钟）
+   ```bash
+   git clone <项目地址>
+   # 按照 README 配置环境
+   # 跑起来，点点看有什么功能
+   ```
+
+2. **带着问题读代码**（2-4 小时）
+   - "这个功能是怎么实现的？" → 从 Controller 一路追到 Service
+   - "为什么这样设计？" → 看注释、看 Commit 记录、看 Issue 讨论
+   - "如果是我会怎么写？" → 对比自己的实现
+
+3. **动手改**（4+ 小时）
+   - 换个模型试试（DeepSeek 换成 GPT-4o）
+   - 加个新功能（比如加个导出对话的功能）
+   - 修个小 Bug 并提 PR（这是简历上非常亮眼的经历）
+
+**不要做的**：
+- ❌ 把整个项目代码从头读到尾（效率极低）
+- ❌ 只看不跑（不运行永远理解不了）
+- ❌ 追求一次看懂 100%（先理解 60%，剩下在实践中补）
+
+---
+
+## 附录 A：推荐资源清单
+
+### 免费课程
+
+| 课程 | 链接 | 时长 |
+|------|------|------|
+| 吴恩达《ChatGPT Prompt Engineering for Developers》 | [DeepLearning.AI](https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/) | 1.5h |
+| 吴恩达《Building Systems with ChatGPT API》 | [DeepLearning.AI](https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/) | 1h |
+| 吴恩达《LangChain for LLM Application Development》 | [DeepLearning.AI](https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/) | 1h |
+| 吴恩达《Building Agentic RAG with LlamaIndex》 | [DeepLearning.AI](https://www.deeplearning.ai/short-courses/building-agentic-rag-with-llamaindex/) | 1h |
+
+### 必读文档
+
+| 文档 | 链接 |
+|------|------|
+| DeepSeek API 文档 | [platform.deepseek.com/docs](https://platform.deepseek.com/docs) |
+| OpenAI API 文档 | [platform.openai.com/docs](https://platform.openai.com/docs) |
+| LangChain4j 文档 | [docs.langchain4j.dev](https://docs.langchain4j.dev/) |
+| Spring AI 文档 | [docs.spring.io/spring-ai](https://docs.spring.io/spring-ai/reference/) |
+
+### GitHub 项目
+
+| 项目 | 说明 |
+|------|------|
+| [langchain4j/langchain4j](https://github.com/langchain4j/langchain4j) | Java 版 LangChain |
+| [spring-projects/spring-ai](https://github.com/spring-projects/spring-ai) | Spring 官方 AI 框架 |
+| [chroma-core/chroma](https://github.com/chroma-core/chroma) | 轻量向量数据库 |
+| [milvus-io/milvus](https://github.com/milvus-io/milvus) | 生产级向量数据库 |
+
+### 中文社区
+
+- **即刻**：搜索「AI 产品经理」「AI 开发」相关圈子
+- **掘金**：搜索「大模型」「RAG」「Agent」标签
+- **知乎**：关注「大语言模型」话题
+- **Twitter/X**：关注 @kaboroflow、@dotey 等 AI 开发者
+
+---
+
+## 附录 B：常见问题 FAQ
+
+### Q1: Java 能做 AI 开发吗？是不是必须学 Python？
+
+**完全可以！** 大部分 AI 应用就是 HTTP 调用 + 业务逻辑，Java 完全胜任。Python 在 AI 训练和数据处理方面更占优势，但对于应用开发，你用 Java 没有任何问题。LangChain4j 和 Spring AI 让 Java AI 开发越来越方便。
+
+### Q2: 需要学机器学习和深度学习吗？
+
+**做应用开发不需要。** 就像你不需要懂发动机原理就能开车一样。但如果未来想深入（如微调模型、训练 Embedding），则需要补充 ML 基础。
+
+### Q3: 大模型会胡说八道怎么办？
+
+这就是"幻觉"问题。降低它的方法：
+- 用 RAG（让 AI 基于文档回答）
+- 降低 Temperature（0.1-0.3）
+- 在 Prompt 中明确说"不确定就说不知道"
+- Function Calling（让 AI 调用工具获取事实，而不是凭空编造）
+
+### Q4: 怎么选模型？DeepSeek vs GPT-4o vs Claude？
+
+| 场景 | 推荐 |
+|------|------|
+| 预算有限 / 学习阶段 | **DeepSeek-V3** |
+| 复杂推理 / 代码生成 | Claude 3.5 Sonnet |
+| 多模态（图片理解） | GPT-4o |
+| 私有化部署 | Qwen 2.5 / Llama 3 |
+
+### Q5: API Key 泄露了怎么办？
+
+**立即去平台删除该 Key 并重新生成。** 同时检查是否有异常调用记录和费用。
+
+### 第 0 章自测题答案
+
+1. Token 是大模型处理文本的最小单位，中文约 1 字 = 1-2 Token，1000 Token ≈ 1500 中文字。
+2. Temperature 0.1 输出确定性高，适合代码/事实问答；1.0 创造性高，适合写作/头脑风暴。
+3. Embedding 将文字转成向量，用于计算语义相似度，是 RAG 检索的基础。
+4. RAG = Retrieval-Augmented Generation（检索增强生成），解决了大模型知识过时、不懂私有文档的问题。
+5. 普通对话只输出文字，Function Calling 让 AI 输出"调用哪个函数"的结构化指令。
+
+---
+
+## 附录 C：Java AI 工具栈速查
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    Java AI 技术栈                      │
+├─────────────────────────────────────────────────────┤
+│                                                       │
+│  应用层                                               │
+│  ├── Spring Boot 3.x         后端框架                  │
+│  ├── Spring AI                官方 AI 集成框架          │
+│  └── LangChain4j             社区 AI 编排框架           │
+│                                                       │
+│  LLM 调用层                                           │
+│  ├── OkHttp / WebClient       HTTP 客户端              │
+│  ├── Retrofit + OpenAI spec  类型安全调用              │
+│  └── LangChain4j Models      统一模型接口              │
+│                                                       │
+│  向量存储层                                           │
+│  ├── PgVector                 PostgreSQL 向量扩展      │
+│  ├── Milvus                   生产级向量数据库          │
+│  ├── Chroma（Python）         学习用轻量数据库          │
+│  └── Qdrant                   高性能向量数据库          │
+│                                                       │
+│  文档处理层                                           │
+│  ├── Apache PDFBox            PDF 解析                 │
+│  ├── Apache POI               Word/Excel 解析          │
+│  └── Apache Tika              通用文档解析              │
+│                                                       │
+│  生产化层                                             │
+│  ├── Spring WebFlux + SSE     流式输出                 │
+│  ├── Redis                    语义缓存                  │
+│  ├── Micrometer + Prometheus  监控                     │
+│  └── Resilience4j             限流/熔断                 │
+│                                                       │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## 附录 D：术语表
+
+| 术语 | 英文 | 解释 |
+|------|------|------|
+| 大语言模型 | LLM (Large Language Model) | 用海量文本训练的超大 AI 模型 |
+| 提示词 | Prompt | 发给 AI 的输入文本 |
+| 提示词工程 | Prompt Engineering | 设计和优化 Prompt 的方法 |
+| 令牌 | Token | 大模型处理文本的最小单位 |
+| 上下文窗口 | Context Window | AI 一次能记住的最大文本量 |
+| 温度 | Temperature | 控制输出随机性的参数 (0-2) |
+| 嵌入 | Embedding | 将文字转成数字向量 |
+| 向量数据库 | Vector Database | 存储和搜索向量的数据库 |
+| 检索增强生成 | RAG | 先查资料再回答的模式 |
+| 函数调用 | Function Calling | 让 AI 调用外部函数 |
+| 智能体 | Agent | 能自主使用工具完成任务 |
+| 幻觉 | Hallucination | AI 编造虚假信息 |
+| 少样本提示 | Few-Shot | 给 AI 示例来引导输出 |
+| 思维链 | Chain of Thought (CoT) | 让 AI 一步步推理 |
+| 流式输出 | Streaming / SSE | 逐字返回，打字机效果 |
+| 微调 | Fine-tuning | 在特定数据上继续训练模型 |
+| 语义缓存 | Semantic Cache | 用语义相似度做缓存 |
+
+---
+
+## 📋 学习检查清单
+
+打印或复制这份清单，每完成一项就打勾 ✅
+
+### 第 0 章：概念扫盲
+- [ ] 能解释 AI → ML → DL → LLM 的关系
+- [ ] 理解 Token、Prompt、Temperature、Embedding 是什么
+- [ ] 能说出 RAG 和 Function Calling 的区别
+
+### 第 1 章：环境准备
+- [ ] 注册了 DeepSeek / OpenAI 账号
+- [ ] 拿到了 API Key 并安全保存
+- [ ] 用 curl 成功调用了一次 API
+
+### 第 2 章：第一个 AI 应用
+- [ ] 创建了 Spring Boot 项目
+- [ ] 跑通了 ChatController → ChatService → DeepSeek API
+- [ ] （可选）搭了前端聊天页面
+
+### 第 3 章：Prompt 工程
+- [ ] 理解了 Prompt 四大要素（角色、任务、格式、约束）
+- [ ] 用 Few-Shot 成功引导了 AI 输出
+- [ ] 用思维链让 AI 推理了复杂问题
+- [ ] 管理了 Prompt 模板（不硬编码）
+
+### 第 4 章：RAG 知识库
+- [ ] 理解了 RAG 的完整流程
+- [ ] 用 Python 或 Java 搭建了 RAG 原型
+- [ ] 成功导入文档并基于文档问答
+- [ ] 调过 chunk_size、top_k 等参数
+
+### 第 5 章：Function Calling 与 Agent
+- [ ] 实现了至少一个 Function Calling（如查天气）
+- [ ] 理解了 Agent 循环（思考→决策→执行→观察）
+- [ ] 搭建了一个综合应用（聊天 + RAG + 工具）
+
+### 第 6 章：生产化
+- [ ] 实现了流式输出（SSE）
+- [ ] 理解了语义缓存的原理
+- [ ] 加了限流和错误重试
+- [ ] 了解了 Docker 部署方式
+
+### 第 7 章：GitHub 实战项目
+- [ ] Clone 并运行了 llm-apps-java-spring-ai 的 chatbot 示例
+- [ ] 跟着 LangChat/ai-tutorials 完成了至少 5 个教程
+- [ ] 部署体验了 Dify 或 FastGPT
+- [ ] 浏览了 Lobe Chat 的前端源码
+- [ ] 完成了 yu-ai-agent 全栈项目（选做）
+
+---
+
+> 🎉 **恭喜你！** 完成全部检查清单后，你已经是一名合格的 AI 应用开发者了。
+>
+> 接下来，建议你选择一个真实场景（比如团队的知识库问答系统），用学到的知识从零搭建，这才是最好的巩固方式。
+
+---
+
+*本手册 v2.0 | 2025 年 7 月 | 如有问题或建议，请联系知识库维护人*
